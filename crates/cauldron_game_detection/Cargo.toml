@@ -1,15 +1,13 @@
 [package]
-name = "pulse"
+name = "cauldron_game_detection"
+publish = false
 edition.workspace = true
 version.workspace = true
 authors.workspace = true
 description.workspace = true
 documentation.workspace = true
 
-[lib]
-crate-type = ["cdylib"]
-
 [dependencies]
-cauldron.workspace = true
-libdecima.workspace = true
-log.workspace = true
+dotenvy = "0.15.7"
+keyvalues-serde = "0.2.2"
+serde = { version = "1.0.219", features = ["derive"] }

@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Add x86_64-pc-windows-msvc Target
         run: rustup target add x86_64-pc-windows-msvc
-      - name: (Temp Fix) Add catppuccin-whiskers
-        run: cargo install catppuccin-whiskers
+      - name: Install cargo-xwin
+        run: cargo install cargo-xwin
       - name: Build
-        run: cargo build --verbose
+        run: cargo heph --target-dir ./output/ -t hfw

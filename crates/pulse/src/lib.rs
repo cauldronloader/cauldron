@@ -1,40 +1,19 @@
-#![feature(let_chains)]
-#![allow(static_mut_refs)]
+use cauldron::CauldronModInfo;
+use cauldron::prelude::*;
 
-use crate::ida_export::ida_export;
-use cauldron::{CauldronLoader, CauldronPlugin, define_cauldron_plugin};
-use libdecima::log;
-use libdecima::types::decima::core::factory_manager::FactoryManager;
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> bool {
+    let loader = unsafe { &*loader_api };
+    init_mod_logger(loader).expect("pulse: failed to initialize mod logger.");
 
-mod ida_export;
+    log::info!("Pulse loaded.");
 
-pub struct PulsePlugin {}
-
-impl CauldronPlugin for PulsePlugin {
-    fn new() -> PulsePlugin {
-        PulsePlugin {}
-    }
-
-    fn on_init(&self, _loader: &CauldronLoader) {
-        let Some(factory) = FactoryManager::get_instance() else {
-            log!("error: failed to get FactoryManager instance");
-            return;
-        };
-        log!("pulse", "found {} types.", factory.types.count);
-        let types = factory.types.slice();
-        let mut new_types = vec![];
-        for ty in types {
-            if !ty.value.is_null() {
-                let ty = unsafe { &*ty.value };
-                new_types.push(ty);
-            }
-        }
-
-        ida_export(new_types).unwrap()
-    }
+    true
 }
 
-unsafe impl Sync for PulsePlugin {}
-unsafe impl Send for PulsePlugin {}
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn cauldron_mod__info() -> *const CauldronModInfo {
+    let info = CauldronModInfo::new("Pulse".into(), 0, Some(env!("CARGO_PKG_AUTHORS").into()));
 
-define_cauldron_plugin!(PulsePlugin, include_str!("../pulse.cauldron.toml"));
+    Box::into_raw(Box::new(info)) as *const CauldronModInfo
+}

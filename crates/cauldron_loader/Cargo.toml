@@ -1,0 +1,20 @@
+[package]
+name = "cauldron_loader"
+publish = false
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[lib]
+name = "cauldron"
+crate-type = ["cdylib"]
+
+[dependencies]
+cauldron.workspace = true
+cauldron_config.workspace = true
+windows-sys = { workspace = true, features = ["Win32_System_Console"] }
+simplelog = { version = "0.12.2", features = ["paris"] }
+log.workspace = true
+libloading = "0.8.8"
