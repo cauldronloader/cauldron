@@ -18,11 +18,14 @@
 ![Alt](https://repobeats.axiom.co/api/embed/24e14d84adbd7b0e7c4640c172ad99c74a3de7d7.svg "Repobeats analytics image")
 
 ## Crates
-- `cauldron-config` - Common configuration across multiple crates.
+- `cauldron` - The core mod loader api.
+- `cauldron_config` - Common configuration across multiple crates.
+- `cauldron_game_detection` - Game installation detection, using metadata like Steam's `libraryfolders.vdf`.
+- `cauldron_loader` - The actual mod loader.
 - `libdecima` - Includes types and addresses for supported games.
-- `winhttp-proxy` - A proxy dll used for loading Cauldron itself.`
+- `pulse` - Decima RTTI and symbol dumper in Cauldron mod form.
+- `winhttp` - A proxy dll used for loading Cauldron itself.`
 - `heph` - The Cauldron build tool. Essentially an `xtask` with a different name.
-
 
 ## Credits
 - [ShadelessFox](https://github.com/ShadelessFox) - For [Decima Workshop](https://github.com/ShadelessFox/decima) and the work they've put into reverse engineering the Decima engine.
