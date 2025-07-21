@@ -103,7 +103,7 @@ impl Game {
             Game::HorizonZeroDawnRemastered => PathBuf::from("Horizon Zero Dawn Remastered"),
             Game::HorizonForbiddenWest => PathBuf::from("Horizon Forbidden West Complete Edition"),
             Game::DeathStranding => PathBuf::from("DEATH STRANDING"),
-            Game::DeathStrandingDirectorsCut => PathBuf::from(" 	DEATH STRANDING DIRECTORS CUT"),
+            Game::DeathStrandingDirectorsCut => PathBuf::from("DEATH STRANDING DIRECTORS CUT"),
         }
     }
 
