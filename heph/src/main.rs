@@ -41,6 +41,14 @@ enum GameTarget {
     /// Horizon: Zero Dawn Remastered
     #[value()]
     HZDR,
+
+    /// DEATH STRANDING
+    #[value()]
+    DS,
+
+    /// DEATH STRANDING DIRECTOR'S CUT
+    #[value()]
+    DSDC,
 }
 
 #[derive(ValueEnum, Clone, Debug, Hash, PartialEq, Eq, Default)]
@@ -68,6 +76,8 @@ impl GameTarget {
             GameTarget::HFW => "hfw",
             GameTarget::HZD => "hzd",
             GameTarget::HZDR => "hzdr",
+            GameTarget::DS => "ds",
+            GameTarget::DSDC => "dsdc",
         }
     }
 }
@@ -78,6 +88,8 @@ impl Into<Game> for &GameTarget {
             GameTarget::HFW => Game::HorizonForbiddenWest,
             GameTarget::HZD => Game::HorizonZeroDawn,
             GameTarget::HZDR => Game::HorizonZeroDawn,
+            GameTarget::DS => Game::DeathStranding,
+            GameTarget::DSDC => Game::DeathStrandingDirectorsCut,
         }
     }
 }
@@ -88,6 +100,8 @@ impl From<&Game> for GameTarget {
             Game::HorizonZeroDawn => GameTarget::HZD,
             Game::HorizonZeroDawnRemastered => GameTarget::HZDR,
             Game::HorizonForbiddenWest => GameTarget::HFW,
+            Game::DeathStranding => GameTarget::DS,
+            Game::DeathStrandingDirectorsCut => GameTarget::DSDC,
         }
     }
 }

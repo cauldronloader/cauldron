@@ -25,6 +25,12 @@ pub enum Game {
 
     /// Horizon: Forbidden West (HFW)
     HorizonForbiddenWest,
+
+    /// DEATH STRANDING(DS)
+    DeathStranding,
+
+    /// DEATH STRANDING DIRECTOR'S CUT (DSDC)
+    DeathStrandingDirectorsCut,
 }
 
 trait InstallPlatform {
@@ -37,6 +43,8 @@ impl Game {
             Game::HorizonZeroDawn => "Horizon: Zero Dawn",
             Game::HorizonZeroDawnRemastered => "Horizon: Zero Dawn Remastered",
             Game::HorizonForbiddenWest => "Horizon: Forbidden West",
+            Game::DeathStranding => "DEATH STRANDING",
+            Game::DeathStrandingDirectorsCut => "DEATH STRANDING DIRECTOR'S CUT",
         }
         .into()
     }
@@ -46,6 +54,8 @@ impl Game {
             Game::HorizonZeroDawn => "hzd",
             Game::HorizonZeroDawnRemastered => "hzdr",
             Game::HorizonForbiddenWest => "hfw",
+            Game::DeathStranding => "ds",
+            Game::DeathStrandingDirectorsCut => "dsdc",
         }
         .into()
     }

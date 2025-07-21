@@ -27,6 +27,14 @@ pub struct LibraryFolder {
 #[derive(Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 pub struct SteamId(pub u32);
 
+
+
+pub const STEAM_ID_HZD: SteamId = SteamId(1151640); // https://steamdb.info/app/1151640/
+pub const STEAM_ID_HZDR: SteamId = SteamId(2561580); // https://steamdb.info/app/2561580/
+pub const STEAM_ID_HFW: SteamId = SteamId(2420110); // https://steamdb.info/app/2420110/
+pub const STEAM_ID_DS: SteamId = SteamId(1190460); // https://steamdb.info/app/1190460/
+pub const STEAM_ID_DSDC: SteamId = SteamId(1850570); // https://steamdb.info/app/1850570/
+
 impl TryFrom<String> for SteamId {
     type Error = std::num::ParseIntError;
 
@@ -48,9 +56,11 @@ impl LibraryFolders {
 impl Into<SteamId> for &Game {
     fn into(self) -> SteamId {
         match self {
-            Game::HorizonZeroDawn => SteamId(1151640), // https://steamdb.info/app/1151640/
-            Game::HorizonZeroDawnRemastered => SteamId(2561580), // https://steamdb.info/app/2561580/
-            Game::HorizonForbiddenWest => SteamId(2420110), // https://steamdb.info/app/2420110/
+            Game::HorizonZeroDawn => STEAM_ID_HZD,
+            Game::HorizonZeroDawnRemastered => STEAM_ID_HZDR,
+            Game::HorizonForbiddenWest => STEAM_ID_HFW,
+            Game::DeathStranding => STEAM_ID_DS,
+            Game::DeathStrandingDirectorsCut => STEAM_ID_DSDC,
         }
     }
 }
@@ -60,10 +70,11 @@ impl TryInto<Game> for &SteamId {
 
     fn try_into(self) -> Result<Game, Self::Error> {
         match self {
-            SteamId(1151640) => Ok(Game::HorizonZeroDawn), // https://steamdb.info/app/1151640/
-            SteamId(2561580) => Ok(Game::HorizonZeroDawnRemastered), // https://steamdb.info/app/2561580/
-            SteamId(2420110) => Ok(Game::HorizonForbiddenWest), // https://steamdb.info/app/2420110/
-
+            &STEAM_ID_HZD => Ok(Game::HorizonZeroDawn),
+            &STEAM_ID_HZDR => Ok(Game::HorizonZeroDawnRemastered),
+            &STEAM_ID_HFW => Ok(Game::HorizonForbiddenWest),
+            &STEAM_ID_DS => Ok(Game::DeathStranding),
+            &STEAM_ID_DSDC => Ok(Game::DeathStrandingDirectorsCut),
             _ => Err(()),
         }
     }
@@ -74,9 +85,11 @@ impl TryFrom<SteamId> for Game {
 
     fn try_from(value: SteamId) -> Result<Self, Self::Error> {
         match value {
-            SteamId(1151640) => Ok(Game::HorizonZeroDawn), // https://steamdb.info/app/1151640/
-            SteamId(2561580) => Ok(Game::HorizonZeroDawnRemastered), // https://steamdb.info/app/2561580/
-            SteamId(2420110) => Ok(Game::HorizonForbiddenWest), // https://steamdb.info/app/2420110/
+            STEAM_ID_HZD => Ok(Game::HorizonZeroDawn),
+            STEAM_ID_HZDR => Ok(Game::HorizonZeroDawnRemastered),
+            STEAM_ID_HFW => Ok(Game::HorizonForbiddenWest),
+            STEAM_ID_DS => Ok(Game::DeathStranding),
+            STEAM_ID_DSDC => Ok(Game::DeathStrandingDirectorsCut),
 
             _ => Err(()),
         }
@@ -89,6 +102,8 @@ impl Game {
             Game::HorizonZeroDawn => PathBuf::from("Horizon Zero Dawn"),
             Game::HorizonZeroDawnRemastered => PathBuf::from("Horizon Zero Dawn Remastered"),
             Game::HorizonForbiddenWest => PathBuf::from("Horizon Forbidden West Complete Edition"),
+            Game::DeathStranding => PathBuf::from("DEATH STRANDING"),
+            Game::DeathStrandingDirectorsCut => PathBuf::from(" 	DEATH STRANDING DIRECTORS CUT"),
         }
     }
 
