@@ -27,8 +27,6 @@ pub struct LibraryFolder {
 #[derive(Deserialize, Debug, Clone, Eq, PartialEq, Hash)]
 pub struct SteamId(pub u32);
 
-
-
 pub const STEAM_ID_HZD: SteamId = SteamId(1151640); // https://steamdb.info/app/1151640/
 pub const STEAM_ID_HZDR: SteamId = SteamId(2561580); // https://steamdb.info/app/2561580/
 pub const STEAM_ID_HFW: SteamId = SteamId(2420110); // https://steamdb.info/app/2420110/
@@ -128,7 +126,7 @@ impl InstallPlatform for SteamInstallPlatform {
             let native = PathBuf::from("C:\\Program Files (x86)\\Steam");
             if !native.exists() {
                 // cannot find steam install
-                return Vec::new()
+                return Vec::new();
             } else {
                 native
             }
@@ -155,7 +153,7 @@ impl InstallPlatform for SteamInstallPlatform {
                 if !flatpak.exists() {
                     if !snap.exists() {
                         // cannot find steam install
-                        return Vec::new()
+                        return Vec::new();
                     } else {
                         snap
                     }
@@ -165,7 +163,6 @@ impl InstallPlatform for SteamInstallPlatform {
             } else {
                 native
             }
-
         } else {
             // not supported os
             return Vec::new();

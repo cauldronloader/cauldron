@@ -1,12 +1,12 @@
-use std::ffi::{c_char, CStr};
+use cauldron::CauldronApi;
 use cauldron_config::{LogLevel, VersionedConfig};
+use libloading::{Library, Symbol};
 use simplelog::{
     ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode, WriteLogger,
 };
+use std::ffi::{CStr, c_char};
 use std::fs::File;
-use libloading::{Library, Symbol};
 use windows_sys::Win32::System::Console::{ATTACH_PARENT_PROCESS, AllocConsole, AttachConsole};
-use cauldron::CauldronApi;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case)]
@@ -28,7 +28,11 @@ pub extern "system" fn DllMain(_: usize, reason: u32, _: isize) -> bool {
 
 pub extern "C" fn noop() {}
 
-pub extern "C" fn loader_log_record(level: cauldron::log::LogLevel, target: *const c_char, message: *const c_char) {
+pub extern "C" fn loader_log_record(
+    level: cauldron::log::LogLevel,
+    target: *const c_char,
+    message: *const c_char,
+) {
     let target_str = unsafe { CStr::from_ptr(target).to_string_lossy() };
     let message_str = unsafe { CStr::from_ptr(message).to_string_lossy() };
     let log_level: log::Level = level.into();
@@ -87,7 +91,6 @@ unsafe fn initialize_loader() {
 
     log::info!("Starting Cauldron v{}...", env!("CARGO_PKG_VERSION"));
 
-
     let mods_dir = std::fs::read_dir("cauldron/mods").expect("Failed to read mods dir");
     for entry in mods_dir {
         let path = entry.unwrap().path();
@@ -96,7 +99,8 @@ unsafe fn initialize_loader() {
 
             let lib = unsafe { Library::new(&path).unwrap() };
 
-            let init_func: Symbol<unsafe extern "C" fn(*const CauldronApi)> = unsafe { lib.get(b"cauldron_mod__load\0").unwrap() };
+            let init_func: Symbol<unsafe extern "C" fn(*const CauldronApi)> =
+                unsafe { lib.get(b"cauldron_mod__load\0").unwrap() };
 
             unsafe { init_func(&LOADER_API as *const CauldronApi) };
 
