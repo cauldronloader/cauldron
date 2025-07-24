@@ -17,8 +17,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install Nightly
-        run: rustup toolchain install nightly --profile minimal
+      - name: Install Nightly and rustfmt
+        run: |
+          rustup toolchain install nightly --profile minimal
+          rustup component install rustfmt
       - name: Cache
         uses: actions/cache@v4
         with: # https://doc.rust-lang.org/cargo/guide/cargo-home.html
