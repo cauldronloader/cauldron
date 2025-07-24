@@ -125,20 +125,51 @@ impl InstallPlatform for SteamInstallPlatform {
         // todo(py): replace return with Result<Vec<Installations>, GameDetectionError>
 
         let steam_path = if cfg!(target_os = "windows") {
-            PathBuf::from("C:\\Program Files (x86)\\Steam")
+            let native = PathBuf::from("C:\\Program Files (x86)\\Steam");
+            if !native.exists() {
+                // cannot find steam install
+                return Vec::new()
+            } else {
+                native
+            }
         } else if cfg!(target_os = "linux") {
-            PathBuf::from(dotenvy::var("HOME").unwrap())
+            let native = PathBuf::from(dotenvy::var("HOME").unwrap())
                 .join(".steam")
+                .join("steam");
+            let flatpak = PathBuf::from(dotenvy::var("HOME").unwrap())
+                .join(".var")
+                .join("app")
+                .join("com.valvesoftware.Steam")
+                .join(".steam")
+                .join("steam");
+            let snap = PathBuf::from(dotenvy::var("HOME").unwrap())
+                .join("snap")
                 .join("steam")
+                .join("common")
+                .join(".local")
+                .join("share")
+                .join("Share");
+
+            // priority: native, flatpak, snap
+            if !native.exists() {
+                if !flatpak.exists() {
+                    if !snap.exists() {
+                        // cannot find steam install
+                        return Vec::new()
+                    } else {
+                        snap
+                    }
+                } else {
+                    flatpak
+                }
+            } else {
+                native
+            }
+
         } else {
             // not supported os
             return Vec::new();
         };
-
-        if !steam_path.exists() {
-            // steam not found
-            return Vec::new();
-        }
 
         let library_folders_path = steam_path.join("steamapps").join("libraryfolders.vdf");
         if !library_folders_path.exists() {
