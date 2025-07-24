@@ -20,7 +20,7 @@ jobs:
       - name: Install Nightly and rustfmt
         run: |
           rustup toolchain install nightly --profile minimal
-          rustup component install rustfmt
+          rustup component add rustfmt
       - name: Cache
         uses: actions/cache@v4
         with: # https://doc.rust-lang.org/cargo/guide/cargo-home.html
