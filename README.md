@@ -24,7 +24,7 @@
 - `cauldron_loader` - The actual mod loader.
 - `libdecima` - Includes types and addresses for supported games.
 - `pulse` - Decima RTTI and symbol dumper in Cauldron mod form.
-- `winhttp` - A proxy dll used for loading Cauldron itself.`
+- `winhttp` - A proxy dll used for loading Cauldron itself.
 - `heph` - The Cauldron build tool. Essentially an `xtask` with a different name.
 
 ## Credits
