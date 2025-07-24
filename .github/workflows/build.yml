@@ -20,11 +20,21 @@ jobs:
       - name: Install Nightly
         run: rustup toolchain install nightly --profile minimal
       - name: Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          save-if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/rewrite' }}
-          cache-directories: |
-            $HOME/.cache/cargo-xwin
+        uses: actions/cache@v4
+        with: # https://doc.rust-lang.org/cargo/guide/cargo-home.html
+          path: |
+            $CARGO_HOME/.crates.toml
+            $CARGO_HOME/.crates2.json
+            $CARGO_HOME/bin
+            $CARGO_HOME/registry/index
+            $CARGO_HOME/registry/cache
+            $CARGO_HOME/git/db
+            ~/.cache/cargo-xwin
+            target/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - name: Add x86_64-pc-windows-msvc Target
         run: rustup target add x86_64-pc-windows-msvc
       - name: Install cargo-xwin
