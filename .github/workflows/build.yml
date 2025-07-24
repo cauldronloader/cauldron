@@ -39,5 +39,7 @@ jobs:
         run: rustup target add x86_64-pc-windows-msvc
       - name: Install cargo-xwin
         run: cargo install cargo-xwin
+      - name: Check formatting
+        run: cargo fmt --check
       - name: Build
         run: cargo heph --target-dir ./output/ -t hfw
