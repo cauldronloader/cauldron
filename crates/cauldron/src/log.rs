@@ -11,7 +11,7 @@ pub enum LogLevel {
 }
 
 impl From<log::Level> for LogLevel {
-    fn from(value: ::log::Level) -> Self {
+    fn from(value: log::Level) -> Self {
         match value {
             log::Level::Error => LogLevel::Error,
             log::Level::Warn => LogLevel::Warn,
@@ -22,7 +22,7 @@ impl From<log::Level> for LogLevel {
     }
 }
 
-impl From<LogLevel> for ::log::Level {
+impl From<LogLevel> for log::Level {
     fn from(value: LogLevel) -> Self {
         match value {
             LogLevel::Error => log::Level::Error,
@@ -34,9 +34,9 @@ impl From<LogLevel> for ::log::Level {
     }
 }
 
-pub fn init_mod_logger(loader: &CauldronApi) -> Result<(), ::log::SetLoggerError> {
+pub fn init_mod_logger(loader: &CauldronApi) -> Result<(), log::SetLoggerError> {
     let logger = ModLogger {
-        log_func: loader.__internal_log_record,
+        log_func: loader.log,
     };
 
     log::set_boxed_logger(Box::new(logger)).map(|()| log::set_max_level(log::LevelFilter::Trace))

@@ -15,17 +15,16 @@ cauldron_config = { path = "crates/cauldron_config" }
 cauldron_game_detection = { path = "crates/cauldron_game_detection" }
 libdecima = { path = "crates/libdecima" }
 
-cauldron_dylib = { path = "crates/cauldron_dylib" }
-cauldron_internal = { path = "crates/cauldron_internal" }
-cauldron_loader = { path = "crates/cauldron_loader" }
-
 anyhow = "1.0.98"
 libc = "1.0.0-alpha.1"
 log = "0.4.27"
 once_cell = "1.21.3"
 parking_lot = "0.12.4"
+retour = "0.4.0-alpha.3"
+semver = "1.0.26"
 serde = "1.0.219"
 thiserror = "2.0.12"
 tokio = "1.46.1"
 tracing = "0.1.41"
+windows = "0.61.3"
 windows-sys = "0.60.2"

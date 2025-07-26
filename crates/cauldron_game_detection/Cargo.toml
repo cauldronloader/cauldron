@@ -11,3 +11,7 @@ documentation.workspace = true
 dotenvy = "0.15.7"
 keyvalues-serde = "0.2.2"
 serde = { version = "1.0.219", features = ["derive"] }
+semver.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["Win32_Storage_FileSystem"] }

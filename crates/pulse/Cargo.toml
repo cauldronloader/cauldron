@@ -13,3 +13,5 @@ crate-type = ["cdylib"]
 cauldron.workspace = true
 libdecima.workspace = true
 log.workspace = true
+once_cell.workspace = true
+retour = { workspace = true, features = ["static-detour"] }

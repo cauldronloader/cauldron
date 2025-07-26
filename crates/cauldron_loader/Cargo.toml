@@ -14,7 +14,13 @@ crate-type = ["cdylib"]
 [dependencies]
 cauldron.workspace = true
 cauldron_config.workspace = true
-windows-sys = { workspace = true, features = ["Win32_System_Console"] }
-simplelog = { version = "0.12.2", features = ["paris"] }
-log.workspace = true
+cauldron_game_detection.workspace = true
 libloading = "0.8.8"
+log.workspace = true
+once_cell.workspace = true
+semver.workspace = true
+simplelog = { version = "0.12.2", features = ["paris"] }
+windows-sys = { workspace = true, features = ["Win32_System_Console"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["Win32_UI_WindowsAndMessaging"] }
