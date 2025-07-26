@@ -27,6 +27,11 @@ pub struct CauldronLoggingConfig {
     /// Type: Boolean (true, false)
     /// Default: true
     pub show_console: bool,
+    /// Disable console colours, may be useful on Proton.
+    ///
+    /// Type: Boolean (true, false)
+    /// Default: false
+    pub disable_colours: bool,
     /// Log level for the console logger.
     ///
     /// Type: Enum (Error, Warn, Info, Debug, Trace)
@@ -84,6 +89,7 @@ impl Default for CauldronConfig {
             logging: CauldronLoggingConfig {
                 show_console: true,
                 console_level: LogLevel::Debug,
+                disable_colours: false,
                 file_path: "cauldron/cauldron.log".into(),
                 file_level: LogLevel::Info,
             },

@@ -152,7 +152,11 @@ unsafe fn initialize_loader() {
             term_level,
             Config::default(),
             TerminalMode::Mixed,
-            ColorChoice::Auto,
+            if config.logging.disable_colours {
+                ColorChoice::Never
+            } else {
+                ColorChoice::Auto
+            },
         ),
         WriteLogger::new(
             write_level,
