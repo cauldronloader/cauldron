@@ -6,6 +6,9 @@
 <br/>
 
 [![CI][sb0]][b0] [![CML][sb2]][b2] [![WORKSHOP][sb1]][b1]
+
+![Alt](https://repobeats.axiom.co/api/embed/24e14d84adbd7b0e7c4640c172ad99c74a3de7d7.svg "Repobeats analytics image")
+
 </div>
 
 [sb0]: https://img.shields.io/github/actions/workflow/status/cauldron-decima/cauldron/build.yml?style=flat-square&logo=rust&logoColor=%23cad3f5&labelColor=%23363a4f&color=%23a6da95
@@ -14,8 +17,6 @@
 [b1]: https://discord.gg/Gt4gkMwadB
 [sb2]: https://img.shields.io/discord/1393062934623682582?style=flat-square&logo=discord&logoColor=%23cad3f5&labelColor=%23363a4f&color=%238aadf4&label=cauldron
 [b2]: https://discord.gg/AhDXJJxFsm
-
-![Alt](https://repobeats.axiom.co/api/embed/24e14d84adbd7b0e7c4640c172ad99c74a3de7d7.svg "Repobeats analytics image")
 
 ## Crates
 - `cauldron` - The core mod loader api.
