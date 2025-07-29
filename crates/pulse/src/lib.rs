@@ -1,5 +1,3 @@
-#![feature(mutex_data_ptr)]
-
 use cauldron::prelude::*;
 use once_cell::sync::Lazy;
 use retour::static_detour;

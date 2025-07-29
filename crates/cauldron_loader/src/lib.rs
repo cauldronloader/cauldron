@@ -240,9 +240,9 @@ unsafe fn initialize_loader() {
             }) {
                 Ok(v) => v,
                 Err(e) => {
-                    message_box("Mod Loading Error", format!("{} has an invalid dependency version constraint for {}: \"{}\", see log for mod details.", &mod_info.name, &dep.name, match &dep.version {
-                        None => &String::from("*"),
-                        Some(v) => v,
+                    message_box("Mod Loading Error", format!("{} has an invalid dependency version constraint for {}: \"{}\", see log for mod details.", &mod_info.name, &dep.name, &match &dep.version {
+                        None => String::from("*"),
+                        Some(v) => v.clone(),
                     }).as_str(), 0u32 | 16u32 /* MB_OK | MB_ICONERROR */);
                     log::error!(
                         "Mod {} has an invalid dependency version constraint for {}: {e}, exiting.",
