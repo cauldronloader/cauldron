@@ -2,6 +2,7 @@ use crate::log::LogLevel;
 use std::ffi::{CString, c_char, c_void};
 
 pub mod log;
+pub mod mem;
 pub mod mod_info;
 
 #[repr(C)]
@@ -15,7 +16,7 @@ pub struct CauldronApi {
 }
 
 impl CauldronApi {
-    pub fn query(&self, namespace: String, name: String) -> Option<*const c_void> {
+    pub fn query(&self, namespace: &str, name: &str) -> Option<*const c_void> {
         let c_namespace = CString::new(namespace).unwrap();
         let c_name = CString::new(name).unwrap();
 
@@ -23,7 +24,7 @@ impl CauldronApi {
         if result.is_null() { None } else { Some(result) }
     }
 
-    pub fn register(&self, namespace: String, name: String, ptr: *const c_void) -> bool {
+    pub fn register(&self, namespace: &str, name: &str, ptr: *const c_void) -> bool {
         let c_namespace = CString::new(namespace).unwrap();
         let c_name = CString::new(name).unwrap();
 

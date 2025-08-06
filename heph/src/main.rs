@@ -6,7 +6,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-const ENABLED_MODS: &[&str] = &["pulse"];
+const ENABLED_MODS: &[&str] = &["libdecima", "pulse"];
 
 #[derive(Parser, Debug)]
 #[command()]

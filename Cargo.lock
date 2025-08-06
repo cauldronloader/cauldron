@@ -62,10 +62,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.98"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e16d2d3311acee920a9eb8d33b8cbc1787ce4a264e85f964c2404b969bdcd487"
+
+[[package]]
 name = "bitflags"
 version = "1.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
+
+[[package]]
+name = "bitflags"
+version = "2.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b8e56985ec62d17e9c1001dc89c88ecd7dc08e47eba5ec7c29c7b5eeecde967"
 
 [[package]]
 name = "block-buffer"
@@ -81,6 +93,7 @@ name = "cauldron"
 version = "0.1.0-alpha"
 dependencies = [
  "log",
+ "windows",
 ]
 
 [[package]]
@@ -461,6 +474,20 @@ checksum = "7222002e5385b4d9327755661e3847c970e8fbf9dea6da8c57f16e8cfbff53a8"
 [[package]]
 name = "libdecima"
 version = "0.1.0-alpha"
+dependencies = [
+ "cauldron",
+ "libdecima_core",
+ "log",
+]
+
+[[package]]
+name = "libdecima_core"
+version = "0.1.0-alpha"
+dependencies = [
+ "bitflags 2.9.1",
+ "cauldron",
+ "windows",
+]
 
 [[package]]
 name = "libloading"
@@ -690,8 +717,9 @@ dependencies = [
 name = "pulse"
 version = "0.1.0-alpha"
 dependencies = [
+ "anyhow",
  "cauldron",
- "libdecima",
+ "libdecima_core",
  "log",
  "once_cell",
  "retour",
@@ -741,7 +769,7 @@ version = "3.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6b6ebd13bc009aef9cd476c1310d49ac354d36e240cf1bd753290f3dc7199a7"
 dependencies = [
- "bitflags",
+ "bitflags 1.3.2",
  "libc 0.2.174",
  "mach2",
  "windows-sys 0.52.0",

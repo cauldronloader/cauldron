@@ -15,7 +15,10 @@ use std::collections::HashMap;
 use std::ffi::{CStr, c_char, c_void};
 use std::fs::File;
 use std::sync::Mutex;
-use windows_sys::Win32::System::Console::{ATTACH_PARENT_PROCESS, AllocConsole, AttachConsole};
+use windows_sys::Win32::System::Console::{
+    ATTACH_PARENT_PROCESS, AllocConsole, AttachConsole, SetConsoleTitleA,
+};
+use windows_sys::core::PCSTR;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case)]
@@ -126,11 +129,29 @@ unsafe fn initialize_loader() {
         VersionedConfig::V1(cauldron_config) => cauldron_config,
     };
 
-    if config.logging.show_console {
-        unsafe {
-            AllocConsole();
-            AttachConsole(ATTACH_PARENT_PROCESS);
+    let game_ver_tuple = cauldron_game_detection::detect_active();
+    let (game, game_version) = match game_ver_tuple {
+        None => {
+            log::error!("Unable to detect the running game or version.");
+            return;
         }
+        Some((game, ver)) => {
+            log::info!("Running on {} v{}", game.pretty_name(), ver);
+
+            (game, ver)
+        }
+    };
+
+    if config.logging.show_console {
+        util::alloc_console(
+            format!(
+                "Cauldron v{} ({} v{})",
+                env!("CARGO_PKG_VERSION"),
+                game.pretty_name(),
+                game_version
+            )
+            .as_str(),
+        );
     }
 
     let term_level = match config.logging.console_level {
@@ -167,19 +188,6 @@ unsafe fn initialize_loader() {
     .expect("Failed to initialize logger");
 
     log::info!("Starting Cauldron v{}...", env!("CARGO_PKG_VERSION"));
-    let game_ver_tuple = cauldron_game_detection::detect_active();
-
-    let (game, game_version) = match game_ver_tuple {
-        None => {
-            log::error!("Unable to detect the running game or version.");
-            return;
-        }
-        Some((game, ver)) => {
-            log::info!("Running on {} v{}", game.pretty_name(), ver);
-
-            (game, ver)
-        }
-    };
 
     let mods_dir = std::fs::read_dir("cauldron/mods").expect("Failed to read mods dir");
     let mut loading_mods: Vec<(Library, SafeCauldronModInfo)> = Vec::new();
@@ -335,4 +343,13 @@ unsafe fn initialize_loader() {
     }
 
     std::mem::forget(loading_mods);
+
+    // temp: dump registered pointers
+    log::debug!("Registered pointers:");
+    for (namespace, ptrs) in &LOADER_STATE.lock().unwrap().registered_funcs {
+        log::debug!("\t{namespace}:");
+        for (name, ptr) in ptrs {
+            log::debug!("\t\t{name} {:p}", *ptr)
+        }
+    }
 }

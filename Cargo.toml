@@ -13,9 +13,10 @@ documentation = "https://cauldron.tallneck.app"
 cauldron = { path = "crates/cauldron" }
 cauldron_config = { path = "crates/cauldron_config" }
 cauldron_game_detection = { path = "crates/cauldron_game_detection" }
-libdecima = { path = "crates/libdecima" }
+libdecima_core = { path = "crates/libdecima_core" }
 
 anyhow = "1.0.98"
+bitflags = "2.9.1"
 libc = "1.0.0-alpha.1"
 log = "0.4.27"
 once_cell = "1.21.3"

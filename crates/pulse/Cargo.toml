@@ -10,8 +10,9 @@ documentation.workspace = true
 crate-type = ["cdylib"]
 
 [dependencies]
+anyhow.workspace = true
 cauldron.workspace = true
-libdecima.workspace = true
+libdecima_core.workspace = true
 log.workspace = true
 once_cell.workspace = true
 retour = { workspace = true, features = ["static-detour"] }

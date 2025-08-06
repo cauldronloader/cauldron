@@ -1,9 +1,9 @@
+mod export_binaryninja;
+
+use crate::export_binaryninja::export_binary_ninja;
 use cauldron::prelude::*;
-use once_cell::sync::Lazy;
+use libdecima_core::types::core::factory_manager::FactoryManager;
 use retour::static_detour;
-use std::ffi::CString;
-use std::ops::Deref;
-use std::sync::Mutex;
 
 static_detour! {
     static RegisterAllTypes: unsafe extern "C" fn();
@@ -18,22 +18,22 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
     let loader = unsafe { &*loader_api };
     init_mod_logger(loader).expect("pulse: failed to initialize mod logger.");
 
-    let c_namespace = CString::new("libdecima/game").unwrap();
-    let c_name = CString::new("uh oh not yet").unwrap();
+    let Some(factory) = FactoryManager::get_instance() else {
+        log::error!("failed to get factory manager");
+        return false;
+    };
 
-    let rtti_register_func_ptr = (loader.query_ptr)(c_namespace.as_ptr(), c_name.as_ptr());
+    log::info!("found {} types", factory.types.count);
 
-    if !rtti_register_func_ptr.is_null() {
-        unsafe {
-            RegisterAllTypes
-                .initialize(std::mem::transmute(rtti_register_func_ptr), || {
-                    register_all_types_impl()
-                })
-                .unwrap()
-        };
-
-        unsafe { RegisterAllTypes.enable().unwrap() };
+    let types = factory.types.slice();
+    let mut new_types = vec![];
+    for ty in types {
+        if !ty.value.is_null() {
+            let ty = unsafe { &*ty.value };
+            new_types.push(ty);
+        }
     }
+    export_binary_ninja(new_types).unwrap();
 
     log::info!("Pulse loaded.");
 
@@ -51,7 +51,7 @@ pub unsafe extern "C" fn cauldron_mod__info() -> *const CauldronModInfo {
             .issue_tracker_url("https://github.com/cauldron-decima/cauldron/issues")
             .author("Pyrrha Wills <pyrrhawills@gmail.com>")
             .dependency(CauldronModDependency::new("hfw", Some(">=1.5.80"), false))
-            // .dependency(CauldronModDependency::new("libdecima", None, false))
+            .dependency(CauldronModDependency::new("libdecima", None, false))
             .build(),
     );
 

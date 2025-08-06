@@ -6,12 +6,10 @@ authors.workspace = true
 description.workspace = true
 documentation.workspace = true
 
+[lib]
+crate-type = ["cdylib"]
 
 [dependencies]
-
-[features]
-default = []
-
-hfw = []  # Horizon: Forbidden West
-hzd = []  # Horizon: Zero Dawn
-hzdr = [] # Horizon: Zero Dawn Remastered
+cauldron.workspace = true
+libdecima_core.workspace = true
+log.workspace = true

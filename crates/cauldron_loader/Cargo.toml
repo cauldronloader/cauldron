@@ -23,4 +23,4 @@ simplelog = { version = "0.12.2", features = ["paris"] }
 windows-sys = { workspace = true, features = ["Win32_System_Console"] }
 
 [target.'cfg(windows)'.dependencies]
-windows = { workspace = true, features = ["Win32_UI_WindowsAndMessaging"] }
+windows = { workspace = true, features = ["Win32_UI_WindowsAndMessaging", "Win32_System_Console"] }
