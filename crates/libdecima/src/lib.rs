@@ -13,8 +13,17 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
     // todo(py): hook something and wait for it to finish rather than just thread sleeping
     std::thread::sleep(Duration::from_secs(2));
 
+    let mut atom_count: u32 = 0;
+    let mut enum_count: u32 = 0;
+    let mut class_count: u32 = 0;
+    let mut struct_count: u32 = 0;
+    let mut typedef_count: u32 = 0;
     let mut function_count: u32 = 0;
     let mut variable_count: u32 = 0;
+    let mut container_count: u32 = 0;
+    let mut reference_count: u32 = 0;
+    let mut pointer_count: u32 = 0;
+    let mut source_file_count: u32 = 0;
 
     let symbols = ExportedSymbols::get().expect("libdecima: failed to get exported symbols");
     for group in symbols.groups.as_slice() {
@@ -24,6 +33,21 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
             let name = symbol.language[0].name().unwrap_or(symbol.name().unwrap());
 
             match symbol.kind {
+                ExportedSymbolKind::Atom => {
+                    atom_count += 1;
+                }
+                ExportedSymbolKind::Enum => {
+                    enum_count += 1;
+                }
+                ExportedSymbolKind::Class => {
+                    class_count += 1;
+                }
+                ExportedSymbolKind::Struct => {
+                    struct_count += 1;
+                }
+                ExportedSymbolKind::Typedef => {
+                    typedef_count += 1;
+                }
                 ExportedSymbolKind::Function => {
                     loader.register(
                         "libdecima/game/functions",
@@ -40,14 +64,34 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
                     );
                     variable_count += 1;
                 }
-                _ => {}
+                ExportedSymbolKind::Container => {
+                    container_count += 1;
+                }
+                ExportedSymbolKind::Reference => {
+                    reference_count += 1;
+                }
+                ExportedSymbolKind::Pointer => {
+                    pointer_count += 1;
+                }
+                ExportedSymbolKind::SourceFile => {
+                    source_file_count += 1;
+                }
             }
         }
     }
 
     log::info!("Registered ExportedSymbols:");
-    log::info!("\tFunctions: {function_count}");
-    log::info!("\tVariables: {variable_count}");
+    log::info!("  Atoms: {atom_count}");
+    log::info!("  Enums: {enum_count}");
+    log::info!("  Classes: {class_count}");
+    log::info!("  Structs: {struct_count}");
+    log::info!("  Typedefs: {typedef_count}");
+    log::info!("  Functions: {function_count}");
+    log::info!("  Variables: {variable_count}");
+    log::info!("  Containers: {container_count}");
+    log::info!("  References: {reference_count}");
+    log::info!("  Pointers: {pointer_count}");
+    log::info!("  Source Files: {source_file_count}");
 
     true
 }
