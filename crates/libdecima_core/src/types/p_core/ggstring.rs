@@ -8,7 +8,7 @@ pub struct StringData {
     pub ref_count: u32,
     pub crc: u32,
     pub length: u32,
-    pub _pad: u32,
+    pub capacity: u32,
 }
 assert_size!(StringData, 0x10);
 impl StringData {
