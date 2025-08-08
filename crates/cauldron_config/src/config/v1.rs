@@ -73,6 +73,12 @@ pub struct CauldronProxyLoaderConfig {
     /// Default: false
     pub enable_rust_backtracing: bool,
 
+    /// Locks the main thread before loading the loader dll and waits for a debugger to attach.
+    ///
+    /// Type: Boolean
+    /// Default: false
+    pub wait_for_debugger: bool,
+
     /// Path to the loader dll file.
     ///
     /// Type: String
@@ -99,6 +105,7 @@ impl Default for CauldronConfig {
             },
             proxy_loader: CauldronProxyLoaderConfig {
                 enable_rust_backtracing: false,
+                wait_for_debugger: false,
                 loader_file: "cauldron/cauldron.dll".into(),
             },
         }

@@ -4,6 +4,7 @@ use cauldron_config::prelude::{VersionedConfig, load_config_or_default};
 use libc::c_void;
 use once_cell::sync::OnceCell;
 use paste::paste;
+use std::time::Duration;
 use std::{mem::transmute, path::PathBuf};
 use windows_sys::{
     Win32::{
@@ -18,6 +19,7 @@ use windows_sys::{
             WINHTTP_STATUS_CALLBACK, WINHTTP_WEB_SOCKET_BUFFER_TYPE,
         },
         System::{
+            Diagnostics::Debug::IsDebuggerPresent,
             LibraryLoader::{GetProcAddress, LoadLibraryA},
             SystemInformation::GetSystemDirectoryA,
             SystemServices::DLL_PROCESS_ATTACH,
@@ -35,6 +37,9 @@ extern "system" fn DllMain(_: isize, reason: u32, _: usize) -> bool {
             let enable_backtrace = match &config {
                 VersionedConfig::V1(config) => config.proxy_loader.enable_rust_backtracing,
             };
+            let wait_for_debugger = match &config {
+                VersionedConfig::V1(config) => config.proxy_loader.wait_for_debugger,
+            };
             let library = match &config {
                 VersionedConfig::V1(config) => {
                     config.proxy_loader.loader_file.clone().replace("/", "\\") // because we're using windows LoadLibraryA
@@ -43,6 +48,12 @@ extern "system" fn DllMain(_: isize, reason: u32, _: usize) -> bool {
 
             if enable_backtrace {
                 std::env::set_var("RUST_BACKTRACE", "full");
+            }
+
+            if wait_for_debugger {
+                while IsDebuggerPresent() == 0 {
+                    std::thread::sleep(Duration::from_secs(1));
+                }
             }
 
             LoadLibraryA(format!("{library}\0").as_str().as_ptr());
