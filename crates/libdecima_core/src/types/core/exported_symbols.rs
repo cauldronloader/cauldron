@@ -69,7 +69,12 @@ impl ExportedSymbolSignature {
             if self.name.is_null() {
                 None
             } else {
-                Some(CStr::from_ptr(self.name).to_str().unwrap_or_default().to_owned())
+                Some(
+                    CStr::from_ptr(self.name)
+                        .to_str()
+                        .unwrap_or_default()
+                        .to_owned(),
+                )
             }
         }
     }
@@ -78,7 +83,10 @@ impl ExportedSymbolSignature {
             if self.name.is_null() {
                 None
             } else {
-                let modifiers = CStr::from_ptr(self.modifiers).to_str().unwrap_or_default().to_owned();
+                let modifiers = CStr::from_ptr(self.modifiers)
+                    .to_str()
+                    .unwrap_or_default()
+                    .to_owned();
                 if modifiers.is_empty() {
                     None
                 } else {
@@ -97,7 +105,12 @@ impl ExportedSymbolSignature {
                     None
                 }
             } else {
-                Some(CStr::from_ptr(self.type_name).to_str().unwrap_or_default().to_owned())
+                Some(
+                    CStr::from_ptr(self.type_name)
+                        .to_str()
+                        .unwrap_or_default()
+                        .to_owned(),
+                )
             }
         }
     }
@@ -137,7 +150,12 @@ impl ExportedSymbolLanguage {
             if self.name.is_null() {
                 None
             } else {
-                Some(CStr::from_ptr(self.name).to_str().unwrap_or_default().to_owned())
+                Some(
+                    CStr::from_ptr(self.name)
+                        .to_str()
+                        .unwrap_or_default()
+                        .to_owned(),
+                )
             }
         }
     }
@@ -148,7 +166,9 @@ impl ExportedSymbolLanguage {
             } else {
                 Some(
                     CStr::from_ptr(self.header_file)
-                        .to_str().unwrap_or_default().to_owned(),
+                        .to_str()
+                        .unwrap_or_default()
+                        .to_owned(),
                 )
             }
         }
@@ -160,7 +180,9 @@ impl ExportedSymbolLanguage {
             } else {
                 Some(
                     CStr::from_ptr(self.source_file)
-                        .to_str().unwrap_or_default().to_owned(),
+                        .to_str()
+                        .unwrap_or_default()
+                        .to_owned(),
                 )
             }
         }
@@ -195,7 +217,12 @@ impl ExportedSymbol {
             if self.namespace.is_null() {
                 None
             } else {
-                Some(CStr::from_ptr(self.namespace).to_str().unwrap_or_default().to_owned())
+                Some(
+                    CStr::from_ptr(self.namespace)
+                        .to_str()
+                        .unwrap_or_default()
+                        .to_owned(),
+                )
             }
         }
     }
@@ -205,7 +232,12 @@ impl ExportedSymbol {
             if self.name.is_null() {
                 None
             } else {
-                Some(CStr::from_ptr(self.name).to_str().unwrap_or_default().to_owned())
+                Some(
+                    CStr::from_ptr(self.name)
+                        .to_str()
+                        .unwrap_or_default()
+                        .to_owned(),
+                )
             }
         }
     }

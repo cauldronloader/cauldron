@@ -3,24 +3,33 @@ use libdecima_core::types::core::exported_symbols::{
 };
 use libdecima_core::types::core::rtti::{RTTI, RTTIContainerData, RTTIKind};
 use std::collections::HashMap;
-use std::ffi::{CStr, c_void};
+use std::ffi::c_void;
 use std::fs::File;
 use std::io::Write as _;
 
 pub fn export_binary_ninja(types: Vec<&RTTI>) -> anyhow::Result<()> {
     let mut output_file = File::create("cauldron/binary_ninja.py")?;
 
-    writeln!(output_file, "log = bv.create_logger(\"decima\")")?;
+    writeln!(output_file, "log = bv.create_logger(\"Decima\")")?;
 
     let mut containers = Vec::new();
     for r#type in &types {
         export_type(&mut output_file, r#type, &mut containers)?;
     }
 
+    writeln!(output_file, r#"
+
+def decima_maybe_set_func_name(addr, name):
+    func = bv.get_function_at(addr)
+    if func != None:
+        func.name = name
+
+    "#)?;
+
     writeln!(output_file, "bv.remove_tag_type(\"decima\")")?;
     writeln!(output_file, "bv.create_tag_type(\"decima\", \"⚙️\")")?;
     // todo(py):
-    let mut tagged_symbols: HashMap<*const c_void, Vec<String>> = HashMap::new();
+    let mut tagged_symbols: HashMap<*const c_void, Vec<(String, String)>> = HashMap::new();
     let symbols = ExportedSymbols::get().unwrap();
     for group in symbols.groups.as_slice() {
         let group = unsafe { &*(*group) };
@@ -29,11 +38,15 @@ pub fn export_binary_ninja(types: Vec<&RTTI>) -> anyhow::Result<()> {
 
     // normally in bv you'd add the tag directly to the Function, but since not all functions are discovered we need to add them to addresses instead.
     for (ptr, symbols) in tagged_symbols {
+        let s = symbols.iter().map(|(s, _)| s.clone()).collect::<Vec<_>>();
         writeln!(
             output_file,
             "bv.add_tag({ptr:p}, \"decima\", \"Decima Exported: \\n{}\")",
-            symbols.join("\\n")
+            s.join("\\n")
         )?;
+        if symbols.len() == 1 {
+            writeln!(output_file, "decima_maybe_set_func_name({ptr:p}, \"{}\")", symbols[0].1)?;
+        }
     }
 
     writeln!(output_file, "log.log_info(\"done\")")?;
@@ -144,7 +157,7 @@ fn export_type(
 }
 
 fn export_symbols_group(
-    tags: &mut HashMap<*const c_void, Vec<String>>,
+    tags: &mut HashMap<*const c_void, Vec<(String, String)>>,
     group: &ExportedSymbolsGroup,
 ) -> anyhow::Result<()> {
     for symbol in group.symbols.as_slice() {
@@ -161,7 +174,7 @@ fn export_symbols_group(
                 let signatures = symbol.language[0].signature.as_slice();
                 tags.entry(symbol.language[0].address)
                     .or_default()
-                    .push(format!("{}{export_name}", signatures[0].as_c_type()))
+                    .push((format!("{}{export_name}", signatures[0].as_c_type()), export_name));
             }
             ExportedSymbolKind::Function => {
                 let signatures = symbol.language[0].signature.as_slice();
@@ -181,7 +194,7 @@ fn export_symbols_group(
                 signature.push_str(");");
                 tags.entry(symbol.language[0].address)
                     .or_default()
-                    .push(signature);
+                    .push((signature, export_name));
             }
             _ => {}
         }

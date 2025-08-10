@@ -1,24 +1,20 @@
 pub mod util;
 
 use crate::util::message_box;
-use cauldron::mod_info::{SafeCauldronModDependency, SafeCauldronModInfo};
+use cauldron::mod_info::SafeCauldronModInfo;
 use cauldron::prelude::{CauldronApi, CauldronModInfo};
 use cauldron_config::{LogLevel, VersionedConfig};
 use libloading::{Library, Symbol};
 use once_cell::sync::Lazy;
 use semver::{Version, VersionReq};
 use simplelog::{
-    ColorChoice, CombinedLogger, Config, LevelFilter, TermLogger, TerminalMode, WriteLogger,
+    ColorChoice, CombinedLogger, ConfigBuilder, LevelFilter, TermLogger, TerminalMode, WriteLogger,
 };
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::ffi::{CStr, c_char, c_void};
 use std::fs::File;
 use std::sync::Mutex;
-use windows_sys::Win32::System::Console::{
-    ATTACH_PARENT_PROCESS, AllocConsole, AttachConsole, SetConsoleTitleA,
-};
-use windows_sys::core::PCSTR;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case)]
@@ -171,7 +167,9 @@ unsafe fn initialize_loader() {
     CombinedLogger::init(vec![
         TermLogger::new(
             term_level,
-            Config::default(),
+            ConfigBuilder::default()
+                .set_target_level(LevelFilter::Error)
+                .build(),
             TerminalMode::Mixed,
             if config.logging.disable_colours {
                 ColorChoice::Never
@@ -181,8 +179,10 @@ unsafe fn initialize_loader() {
         ),
         WriteLogger::new(
             write_level,
-            Config::default(),
-            File::create("cauldron/cauldron.log").unwrap(),
+            ConfigBuilder::default()
+                .set_target_level(LevelFilter::Error)
+                .build(),
+            File::create(config.logging.file_path).unwrap(),
         ),
     ])
     .expect("Failed to initialize logger");
@@ -342,14 +342,7 @@ unsafe fn initialize_loader() {
         // todo(py): handle mod load failure
     }
 
-    std::mem::forget(loading_mods);
+    log::info!("Mod loading complete.");
 
-    // temp: dump registered pointers
-    log::debug!("Registered pointers:");
-    for (namespace, ptrs) in &LOADER_STATE.lock().unwrap().registered_funcs {
-        log::debug!("\t{namespace}:");
-        for (name, ptr) in ptrs {
-            log::debug!("\t\t{name} {:p}", *ptr)
-        }
-    }
+    std::mem::forget(loading_mods);
 }
