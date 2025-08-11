@@ -1,0 +1,13 @@
+[package]
+name = "relic"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+eframe = "0.32.0"
+egui = "0.32.0"
+egui_extras = { version = "0.32.0", features = ["image"] }
+log.workspace = true

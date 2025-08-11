@@ -32,7 +32,8 @@ def decima_tag_func(addr, tag):
     if func != None:
         func.add_tag("decima", tag)
     else:
-        bv.add_tag("decima", tag)
+        bv.add_tag(addr, "decima", tag)
+
     "#)?;
 
     let mut tagged_symbols: HashMap<*const c_void, Vec<(String, String)>> = HashMap::new();
