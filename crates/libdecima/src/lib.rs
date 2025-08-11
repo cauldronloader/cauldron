@@ -30,7 +30,7 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
         let group = unsafe { &**group };
         for symbol in group.symbols.as_slice() {
             let namespace = symbol.namespace().unwrap_or_default();
-            let name = symbol.language[0].name().unwrap_or(symbol.name().unwrap());
+            let name = symbol.exported_definition.name().unwrap_or(symbol.name().unwrap());
 
             match symbol.kind {
                 ExportedSymbolKind::Atom => {
@@ -52,7 +52,7 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
                     loader.register(
                         "libdecima/game/functions",
                         format!("{namespace}/{name}").as_str(),
-                        symbol.language[0].address,
+                        symbol.exported_definition.address,
                     );
                     function_count += 1;
                 }
@@ -60,7 +60,7 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
                     loader.register(
                         "libdecima/game/variable",
                         format!("{namespace}/{name}").as_str(),
-                        symbol.language[0].address,
+                        symbol.exported_definition.address,
                     );
                     variable_count += 1;
                 }

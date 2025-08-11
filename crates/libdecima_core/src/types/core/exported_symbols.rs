@@ -54,16 +54,16 @@ bitflags! {
 
 #[derive(Debug, Clone)]
 #[repr(C)]
-pub struct ExportedSymbolSignature {
+pub struct ExportedSymbolToken {
     pub type_name: *const c_char,
     pub modifiers: *const c_char,
     pub r#type: *mut RTTI,
     pub name: *const c_char,
     pub flags: ExportedSymbolSignatureFlags,
 }
-assert_size!(ExportedSymbolSignature, 0x28);
+assert_size!(ExportedSymbolToken, 0x28);
 
-impl ExportedSymbolSignature {
+impl ExportedSymbolToken {
     pub fn name(&self) -> Option<String> {
         unsafe {
             if self.name.is_null() {
@@ -122,6 +122,10 @@ impl ExportedSymbolSignature {
         )
     }
 
+    pub fn as_named_c_type(&self) -> String {
+        format!("{} /* {} */", self.as_c_type(), self.type_name().unwrap_or(String::from("void")))
+    }
+
     pub fn as_c_argument(&self, default_name: String) -> String {
         format!(
             "{}{}",
@@ -133,18 +137,18 @@ impl ExportedSymbolSignature {
 
 #[derive(Debug, Clone)]
 #[repr(C)]
-pub struct ExportedSymbolLanguage {
+pub struct ExportedSymbolDefinition {
     pub address: *mut c_void,
     pub name: *const c_char,
     pub header_file: *const c_char,
     pub source_file: *const c_char,
-    pub signature: Array<ExportedSymbolSignature>,
+    pub tokens: Array<ExportedSymbolToken>,
     pub fn_unk30: *mut c_void,
     pub fn_unk38: *mut c_void,
 }
-assert_size!(ExportedSymbolLanguage, 0x40);
+assert_size!(ExportedSymbolDefinition, 0x40);
 
-impl ExportedSymbolLanguage {
+impl ExportedSymbolDefinition {
     pub fn name(&self) -> Option<String> {
         unsafe {
             if self.name.is_null() {
@@ -207,7 +211,8 @@ pub struct ExportedSymbol {
     pub name: *const c_char,
     pub size_type: *const RTTI,
     pub flags: ExportedSymbolFlags,
-    pub language: [ExportedSymbolLanguage; 2],
+    pub exported_definition: ExportedSymbolDefinition,
+    pub internal_definition: ExportedSymbolDefinition,
 }
 assert_size!(ExportedSymbol, 0xB0);
 

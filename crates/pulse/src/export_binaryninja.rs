@@ -19,16 +19,22 @@ pub fn export_binary_ninja(types: Vec<&RTTI>) -> anyhow::Result<()> {
 
     writeln!(output_file, r#"
 
-def decima_maybe_set_func_name(addr, name):
+bv.remove_tag_type("decima")
+bv.create_tag_type("decima", "⚙️")
+
+def decima_set_func_name(addr, name):
     func = bv.get_function_at(addr)
     if func != None:
         func.name = name
 
+def decima_tag_func(addr, tag):
+    func = bv.get_function_at(addr)
+    if func != None:
+        func.add_tag("decima", tag)
+    else:
+        bv.add_tag("decima", tag)
     "#)?;
 
-    writeln!(output_file, "bv.remove_tag_type(\"decima\")")?;
-    writeln!(output_file, "bv.create_tag_type(\"decima\", \"⚙️\")")?;
-    // todo(py):
     let mut tagged_symbols: HashMap<*const c_void, Vec<(String, String)>> = HashMap::new();
     let symbols = ExportedSymbols::get().unwrap();
     for group in symbols.groups.as_slice() {
@@ -41,11 +47,11 @@ def decima_maybe_set_func_name(addr, name):
         let s = symbols.iter().map(|(s, _)| s.clone()).collect::<Vec<_>>();
         writeln!(
             output_file,
-            "bv.add_tag({ptr:p}, \"decima\", \"Decima Exported: \\n{}\")",
+            "decima_tag_func({ptr:p},\"{}\")",
             s.join("\\n")
         )?;
         if symbols.len() == 1 {
-            writeln!(output_file, "decima_maybe_set_func_name({ptr:p}, \"{}\")", symbols[0].1)?;
+            writeln!(output_file, "decima_set_func_name({ptr:p}, \"{}\")", symbols[0].1)?;
         }
     }
 
@@ -162,7 +168,7 @@ fn export_symbols_group(
 ) -> anyhow::Result<()> {
     for symbol in group.symbols.as_slice() {
         let export_name = {
-            let name = symbol.language[0].name().unwrap_or(symbol.name().unwrap());
+            let name = symbol.exported_definition.name().unwrap_or(symbol.name().unwrap());
             if let Some(namespace) = symbol.namespace() {
                 format!("{namespace}::{name}")
             } else {
@@ -171,15 +177,15 @@ fn export_symbols_group(
         };
         match symbol.kind {
             ExportedSymbolKind::Variable => {
-                let signatures = symbol.language[0].signature.as_slice();
-                tags.entry(symbol.language[0].address)
+                let tokens = symbol.exported_definition.tokens.as_slice();
+                tags.entry(symbol.exported_definition.address)
                     .or_default()
-                    .push((format!("{}{export_name}", signatures[0].as_c_type()), export_name));
+                    .push((format!("{}{export_name}", tokens[0].as_c_type()), export_name));
             }
             ExportedSymbolKind::Function => {
-                let signatures = symbol.language[0].signature.as_slice();
-                let mut signature = format!("{}{export_name}(", signatures[0].as_c_type());
-                for (i, argument) in signatures.iter().enumerate() {
+                let tokens = symbol.exported_definition.tokens.as_slice();
+                let mut signature = format!("{}{export_name}(", tokens[0].as_c_type());
+                for (i, argument) in tokens.iter().enumerate() {
                     if i == 0 {
                         // index 0 is the function return type
                         continue;
@@ -192,7 +198,7 @@ fn export_symbols_group(
                     signature.push_str(argument.as_c_argument(format!("arg{i}")).as_str());
                 }
                 signature.push_str(");");
-                tags.entry(symbol.language[0].address)
+                tags.entry(symbol.exported_definition.address)
                     .or_default()
                     .push((signature, export_name));
             }
