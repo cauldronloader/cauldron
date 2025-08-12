@@ -1,4 +1,6 @@
 <div align="center">
+    <br>
+    <img src="https://raw.githubusercontent.com/cauldron-decima/art/refs/heads/main/icon/1024w/cauldron-full.png"  alt="cauldron logo" width="256" style="border-radius: 15%"/>
 	<h1 align="center"><b>Cauldron</b></h1>
 	<p align="center">
 		A Decima mod loader.
