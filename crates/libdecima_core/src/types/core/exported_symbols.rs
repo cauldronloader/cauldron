@@ -123,7 +123,11 @@ impl ExportedSymbolToken {
     }
 
     pub fn as_named_c_type(&self) -> String {
-        format!("{} /* {} */", self.as_c_type(), self.type_name().unwrap_or(String::from("void")))
+        format!(
+            "{} /* {} */",
+            self.as_c_type(),
+            self.type_name().unwrap_or(String::from("void"))
+        )
     }
 
     pub fn as_c_argument(&self, default_name: String) -> String {

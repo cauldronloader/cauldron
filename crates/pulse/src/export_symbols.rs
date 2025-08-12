@@ -1,4 +1,6 @@
-use libdecima_core::types::core::exported_symbols::{ExportedSymbolKind, ExportedSymbolDefinition, ExportedSymbols, ExportedSymbolToken};
+use libdecima_core::types::core::exported_symbols::{
+    ExportedSymbolDefinition, ExportedSymbolKind, ExportedSymbolToken, ExportedSymbols,
+};
 use std::ffi::CStr;
 use std::fs::File;
 use std::io::Write as _;
@@ -48,7 +50,9 @@ pub fn export_symbols() -> anyhow::Result<()> {
                     .to_owned()
             }
         };
-        let name = definition.name().unwrap_or(symbol.name().unwrap_or_default());
+        let name = definition
+            .name()
+            .unwrap_or(symbol.name().unwrap_or_default());
         let definition = {
             match kind {
                 ExportedSymbolKind::Function => {
@@ -82,7 +86,7 @@ pub fn export_symbols() -> anyhow::Result<()> {
                 ExportedSymbolKind::Variable => {
                     let tokens = definition.tokens.as_slice();
                     let token: &ExportedSymbolToken = tokens.get(0).unwrap();
-                     format!("{}", token.as_named_c_type())
+                    format!("{}", token.as_named_c_type())
                 }
                 _ => String::new(),
             }

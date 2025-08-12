@@ -30,7 +30,10 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
         let group = unsafe { &**group };
         for symbol in group.symbols.as_slice() {
             let namespace = symbol.namespace().unwrap_or_default();
-            let name = symbol.exported_definition.name().unwrap_or(symbol.name().unwrap());
+            let name = symbol
+                .exported_definition
+                .name()
+                .unwrap_or(symbol.name().unwrap());
 
             match symbol.kind {
                 ExportedSymbolKind::Atom => {

@@ -52,7 +52,11 @@ unsafe extern "C" fn NodeGraph_Trace_impl(uuid: GGUUID, text: *const c_char) {
 }
 
 #[allow(non_snake_case)]
-unsafe extern "C" fn NodeGraph_Assert_impl(uuid: GGUUID, text: *const c_char, text2: *const c_char) {
+unsafe extern "C" fn NodeGraph_Assert_impl(
+    uuid: GGUUID,
+    text: *const c_char,
+    text2: *const c_char,
+) {
     let text = unsafe { CStr::from_ptr(text).to_str().unwrap().to_owned() };
     let text2 = unsafe { CStr::from_ptr(text2).to_str().unwrap().to_owned() };
     log::info!("NodeGraph::Assert({uuid:?}, {text:?}, {text2:?})");
@@ -131,7 +135,6 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
         };
     }
 
-
     std::thread::sleep(Duration::from_secs(5)); // wait for all symbols to load
     let Some(factory) = FactoryManager::get_instance() else {
         log::error!("failed to get factory manager");
@@ -151,7 +154,6 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
     } else {
         log::error!("Failed to export for Binary Ninja.");
     }
-
 
     if export_symbols().is_ok() {
         log::info!("Exported symbols to cauldron/symbols.csv");

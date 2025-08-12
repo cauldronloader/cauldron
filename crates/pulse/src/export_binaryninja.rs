@@ -10,14 +10,31 @@ use std::io::Write as _;
 pub fn export_binary_ninja(types: Vec<&RTTI>) -> anyhow::Result<()> {
     let mut output_file = File::create("cauldron/binary_ninja.py")?;
 
-    writeln!(output_file, "log = bv.create_logger(\"Decima\")")?;
+    writeln!(
+        output_file,
+        r#"
+
+log = bv.create_logger("Decima")
+log.log_info("Starting...")
+
+"#
+    )?;
 
     let mut containers = Vec::new();
-    for r#type in &types {
+    for (i, r#type) in types.iter().enumerate() {
+        writeln!(
+            output_file,
+            "log.log_info(\"Exporting Types: {}/{} ({:.0}%)\")",
+            i + 1,
+            &types.len(),
+            (i as f64 + 1.0) / types.len() as f64 * 100.0
+        )?;
         export_type(&mut output_file, r#type, &mut containers)?;
     }
 
-    writeln!(output_file, r#"
+    writeln!(
+        output_file,
+        r#"
 
 bv.remove_tag_type("decima")
 bv.create_tag_type("decima", "⚙️")
@@ -34,7 +51,8 @@ def decima_tag_func(addr, tag):
     else:
         bv.add_tag(addr, "decima", tag)
 
-    "#)?;
+    "#
+    )?;
 
     let mut tagged_symbols: HashMap<*const c_void, Vec<(String, String)>> = HashMap::new();
     let symbols = ExportedSymbols::get().unwrap();
@@ -44,7 +62,15 @@ def decima_tag_func(addr, tag):
     }
 
     // normally in bv you'd add the tag directly to the Function, but since not all functions are discovered we need to add them to addresses instead.
-    for (ptr, symbols) in tagged_symbols {
+    for (i, (ptr, symbols)) in tagged_symbols.iter().enumerate() {
+        writeln!(
+            output_file,
+            "log.log_info(\"Exporting Symbols: {}/{} ({:.0}%)\")",
+            i + 1,
+            tagged_symbols.len(),
+            (i as f64 + 1.0) / tagged_symbols.len() as f64 * 100.0
+        )?;
+
         let s = symbols.iter().map(|(s, _)| s.clone()).collect::<Vec<_>>();
         writeln!(
             output_file,
@@ -52,7 +78,11 @@ def decima_tag_func(addr, tag):
             s.join("\\n")
         )?;
         if symbols.len() == 1 {
-            writeln!(output_file, "decima_set_func_name({ptr:p}, \"{}\")", symbols[0].1)?;
+            writeln!(
+                output_file,
+                "decima_set_func_name({ptr:p}, \"{}\")",
+                symbols[0].1
+            )?;
         }
     }
 
@@ -169,7 +199,10 @@ fn export_symbols_group(
 ) -> anyhow::Result<()> {
     for symbol in group.symbols.as_slice() {
         let export_name = {
-            let name = symbol.exported_definition.name().unwrap_or(symbol.name().unwrap());
+            let name = symbol
+                .exported_definition
+                .name()
+                .unwrap_or(symbol.name().unwrap());
             if let Some(namespace) = symbol.namespace() {
                 format!("{namespace}::{name}")
             } else {
@@ -181,7 +214,10 @@ fn export_symbols_group(
                 let tokens = symbol.exported_definition.tokens.as_slice();
                 tags.entry(symbol.exported_definition.address)
                     .or_default()
-                    .push((format!("{}{export_name}", tokens[0].as_c_type()), export_name));
+                    .push((
+                        format!("{}{export_name}", tokens[0].as_c_type()),
+                        export_name,
+                    ));
             }
             ExportedSymbolKind::Function => {
                 let tokens = symbol.exported_definition.tokens.as_slice();
