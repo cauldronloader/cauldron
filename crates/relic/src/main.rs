@@ -1,3 +1,6 @@
+use eframe::Frame;
+use egui::Context;
+
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
@@ -13,4 +16,18 @@ fn main() -> eframe::Result {
         options,
         Box::new(|_cc| Ok(Box::new(RelicApp::new()))),
     )
+}
+
+
+struct RelicApp {}
+impl eframe::App for RelicApp {
+    fn update(&mut self, ctx: &Context, frame: &mut Frame) {
+
+    }
+}
+
+impl RelicApp {
+    fn new() -> Self {
+        RelicApp {}
+    }
 }
