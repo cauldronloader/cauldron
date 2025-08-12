@@ -12,29 +12,11 @@ pub fn export_binary_ninja(types: Vec<&RTTI>) -> anyhow::Result<()> {
 
     writeln!(
         output_file,
-        r#"
+        r#"import time
 
 log = bv.create_logger("Decima")
 log.log_info("Starting...")
-
-"#
-    )?;
-
-    let mut containers = Vec::new();
-    for (i, r#type) in types.iter().enumerate() {
-        writeln!(
-            output_file,
-            "log.log_info(\"Exporting Types: {}/{} ({:.0}%)\")",
-            i + 1,
-            &types.len(),
-            (i as f64 + 1.0) / types.len() as f64 * 100.0
-        )?;
-        export_type(&mut output_file, r#type, &mut containers)?;
-    }
-
-    writeln!(
-        output_file,
-        r#"
+start_time = time.time()
 
 bv.remove_tag_type("decima")
 bv.create_tag_type("decima", "⚙️")
@@ -51,8 +33,20 @@ def decima_tag_func(addr, tag):
     else:
         bv.add_tag(addr, "decima", tag)
 
-    "#
+"#
     )?;
+
+    let mut containers = Vec::new();
+    for (i, r#type) in types.iter().enumerate() {
+        writeln!(
+            output_file,
+            "log.log_info(\"Exporting Types: {}/{} ({:.0}%)\")",
+            i + 1,
+            &types.len(),
+            ((i as f64 + 1.0) / types.len() as f64 * 100.0).floor()
+        )?;
+        export_type(&mut output_file, r#type, &mut containers)?;
+    }
 
     let mut tagged_symbols: HashMap<*const c_void, Vec<(String, String)>> = HashMap::new();
     let symbols = ExportedSymbols::get().unwrap();
@@ -61,14 +55,14 @@ def decima_tag_func(addr, tag):
         export_symbols_group(&mut tagged_symbols, group)?;
     }
 
-    // normally in bv you'd add the tag directly to the Function, but since not all functions are discovered we need to add them to addresses instead.
     for (i, (ptr, symbols)) in tagged_symbols.iter().enumerate() {
+        let ptr = *ptr;
         writeln!(
             output_file,
             "log.log_info(\"Exporting Symbols: {}/{} ({:.0}%)\")",
             i + 1,
             tagged_symbols.len(),
-            (i as f64 + 1.0) / tagged_symbols.len() as f64 * 100.0
+            ((i as f64 + 1.0) / tagged_symbols.len() as f64 * 100.0).floor()
         )?;
 
         let s = symbols.iter().map(|(s, _)| s.clone()).collect::<Vec<_>>();
@@ -86,7 +80,10 @@ def decima_tag_func(addr, tag):
         }
     }
 
-    writeln!(output_file, "log.log_info(\"done\")")?;
+    writeln!(
+        output_file,
+        "\nlog.log_info(\"Done. (Took %s seconds)\" % (time.time() - start_time))"
+    )?;
 
     Ok(())
 }

@@ -18,12 +18,9 @@ fn main() -> eframe::Result {
     )
 }
 
-
 struct RelicApp {}
 impl eframe::App for RelicApp {
-    fn update(&mut self, ctx: &Context, frame: &mut Frame) {
-
-    }
+    fn update(&mut self, ctx: &Context, frame: &mut Frame) {}
 }
 
 impl RelicApp {
