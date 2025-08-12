@@ -19,6 +19,7 @@ libloading = "0.8.8"
 log.workspace = true
 once_cell.workspace = true
 semver.workspace = true
+retour = { workspace = true, features = ["static-detour"] }
 simplelog = { version = "0.12.2", features = ["paris"] }
 windows-sys = { workspace = true, features = ["Win32_System_Console"] }
 

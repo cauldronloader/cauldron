@@ -1,11 +1,13 @@
 pub mod util;
 
 use crate::util::message_box;
+use cauldron::mem::offset::Offset;
 use cauldron::mod_info::SafeCauldronModInfo;
 use cauldron::prelude::{CauldronApi, CauldronModInfo};
 use cauldron_config::{LogLevel, VersionedConfig};
 use libloading::{Library, Symbol};
 use once_cell::sync::Lazy;
+use retour::static_detour;
 use semver::{Version, VersionReq};
 use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, LevelFilter, TermLogger, TerminalMode, WriteLogger,
@@ -21,9 +23,7 @@ use std::sync::Mutex;
 pub extern "system" fn DllMain(_: usize, reason: u32, _: isize) -> bool {
     match reason {
         // DLL_PROCESS_ATTACH
-        1 => unsafe {
-            std::thread::spawn(|| initialize_loader());
-        },
+        1 => loader_prepare(),
 
         // DLL_PROCESS_DETACH
         0 => {
@@ -32,6 +32,46 @@ pub extern "system" fn DllMain(_: usize, reason: u32, _: isize) -> bool {
         _ => {}
     }
     true
+}
+
+static_detour! {
+    static CoreLibrary_Initialize: unsafe extern "C" fn(*mut c_void, *mut c_void, *mut c_void) -> u64;
+}
+
+#[allow(non_snake_case)]
+fn CoreLibrary_Initialize_impl(
+    application: *mut c_void,
+    core_library_hinstance: *mut c_void,
+    lock: *mut c_void,
+) -> u64 {
+    let result = unsafe { CoreLibrary_Initialize.call(application, core_library_hinstance, lock) };
+
+    unsafe {
+        loader_initialize();
+    }
+
+    result
+}
+
+// hooks the function that loads and initializes fullgame.dll
+fn loader_prepare() {
+    unsafe {
+        let Ok(offset) =
+            Offset::from_signature("48 8B C4 4C 89 40 ? 55 53 57 41 54 48 8D A8 58 FE FF FF")
+        else {
+            // todo(py): alert user of failure
+            return;
+        };
+
+        CoreLibrary_Initialize
+            .initialize(
+                std::mem::transmute(offset.as_ptr::<*mut c_void>()),
+                CoreLibrary_Initialize_impl,
+            )
+            .unwrap()
+            .enable()
+            .unwrap();
+    }
 }
 
 static LOADER_STATE: Lazy<Mutex<LoaderState>> = Lazy::new(|| Mutex::new(LoaderState::default()));
@@ -119,7 +159,7 @@ static LOADER_API: CauldronApi = CauldronApi {
     log: loader_log_impl,
 };
 
-unsafe fn initialize_loader() {
+unsafe fn loader_initialize() {
     let config = cauldron_config::load_config_or_write_default();
     let config = match config {
         VersionedConfig::V1(cauldron_config) => cauldron_config,

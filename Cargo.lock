@@ -127,6 +127,7 @@ dependencies = [
  "libloading",
  "log",
  "once_cell",
+ "retour",
  "semver",
  "simplelog",
  "windows",
