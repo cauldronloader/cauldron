@@ -9,10 +9,6 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
     let loader = unsafe { &*loader_api };
     init_mod_logger(loader).expect("libdecima: failed to initialize mod logger.");
 
-    // just wait a couple seconds to make sure we're loading after symbol registration has complete
-    // todo(py): hook something and wait for it to finish rather than just thread sleeping
-    std::thread::sleep(Duration::from_secs(2));
-
     let mut atom_count: u32 = 0;
     let mut enum_count: u32 = 0;
     let mut class_count: u32 = 0;
