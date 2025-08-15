@@ -44,11 +44,11 @@ fn CoreLibrary_Initialize_impl(
     core_library_hinstance: *mut c_void,
     lock: *mut c_void,
 ) -> u64 {
-    let result = unsafe { CoreLibrary_Initialize.call(application, core_library_hinstance, lock) };
-
     unsafe {
         loader_initialize();
     }
+
+    let result = unsafe { CoreLibrary_Initialize.call(application, core_library_hinstance, lock) };
 
     result
 }
