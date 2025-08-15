@@ -3,7 +3,7 @@ use libdecima_core::types::core::exported_symbols::{
 };
 use libdecima_core::types::core::rtti::{RTTI, RTTIContainerData, RTTIKind};
 use std::collections::HashMap;
-use std::ffi::c_void;
+use std::ffi::{CStr, c_void};
 use std::fs::File;
 use std::io::Write as _;
 
@@ -114,10 +114,6 @@ fn export_type(
     let type_str = bn_symbol_name(&rtti);
 
     writeln!(file, "# {type_str} ({kind_str})")?;
-    writeln!(
-        file,
-        "bv.define_data_var({rtti:p}, \"{kind_str}\", \"RTTI_{type_str}\")"
-    )?;
 
     if let Some(compound) = rtti.as_compound() {
         let bases_len = compound.bases_len as usize;
@@ -155,6 +151,15 @@ fn export_type(
                 "bv.define_data_var({msg_order_entries:p}, ArrayType.create(bv.types[\"RTTICompound__MessageOrderEntry\"], {msg_order_entries_len}), \"RTTI_{type_str}__message_order_entries\")"
             )?;
         }
+
+        let ordered_attrs_len = compound.ordered_attributes_len as usize;
+        let ordered_attrs = compound.ordered_attributes;
+        if !ordered_attrs.is_null() {
+            writeln!(
+                file,
+                "bv.define_data_var({ordered_attrs:p}, ArrayType.create(bv.types[\"RTTICompound__OrderedAttribute\"], {ordered_attrs_len}), \"RTTI_{type_str}__ordered_attributes\")"
+            )?;
+        }
     }
 
     if let Some(r#enum) = rtti.as_enum() {
@@ -172,20 +177,31 @@ fn export_type(
         if !unsafe { containers.contains(&std::mem::transmute(container.container_type)) } {
             unsafe { containers.push(std::mem::transmute(container.container_type)) };
             let data = container.container_type;
+            let container_name = unsafe {
+                CStr::from_ptr((&*data).type_name)
+                    .to_str()
+                    .unwrap()
+                    .to_owned()
+            };
 
             if container.base.kind == RTTIKind::Pointer {
                 writeln!(
                     file,
-                    "bv.define_data_var({data:p}, \"RTTIPointer__Data\", \"RTTI_{type_str}__pointer\")"
+                    "bv.define_data_var({data:p}, \"RTTIPointer__Data\", \"RTTIPointer_{container_name}\")"
                 )?;
             } else {
                 writeln!(
                     file,
-                    "bv.define_data_var({data:p}, \"RTTIContainer__Data\", \"RTTI_{type_str}__container\")"
+                    "bv.define_data_var({data:p}, \"RTTIContainer__Data\", \"RTTIContainer_{container_name}\")"
                 )?;
             }
         }
     }
+
+    writeln!(
+        file,
+        "bv.define_data_var({rtti:p}, \"{kind_str}\", \"RTTI_{type_str}\")"
+    )?;
 
     Ok(())
 }
