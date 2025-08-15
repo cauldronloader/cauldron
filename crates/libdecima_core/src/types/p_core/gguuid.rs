@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display, Formatter};
 
-#[derive(Clone)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 #[repr(C)]
 pub struct GGUUID {
     pub data0: u8,
@@ -24,7 +24,7 @@ pub struct GGUUID {
 impl Display for GGUUID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!(
-            "{:x}{:x}{:x}{:x}-{:x}{:x}-{:x}{:x}-{:x}{:x}-{:x}{:x}{:x}{:x}{:x}{:x}",
+            "{:2x}{:2x}{:2x}{:2x}-{:2x}{:2x}-{:2x}{:2x}-{:2x}{:2x}-{:2x}{:2x}{:2x}{:2x}{:2x}{:2x}",
             self.data0,
             self.data1,
             self.data2,
@@ -42,11 +42,5 @@ impl Display for GGUUID {
             self.data14,
             self.data15
         ))
-    }
-}
-
-impl Debug for GGUUID {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("GGUUID {{ {} }}", self))
     }
 }
