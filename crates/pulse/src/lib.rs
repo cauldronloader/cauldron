@@ -278,6 +278,12 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
         }
     }
 
+    if export_types().is_ok() {
+        log::info!("exported types");
+    } else {
+        log::error!("failed to export types");
+    }
+
     if export_binary_ninja(new_types).is_ok() {
         log::info!("Binary Ninja script exported to cauldron/binary_ninja.py");
     } else {
