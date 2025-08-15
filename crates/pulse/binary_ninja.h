@@ -116,7 +116,7 @@ struct RTTICompound__MessageOrderEntry
     struct RTTI* compound;
 };
 
-struct __base(RTTI, 0) RTTICompound __packed
+struct __base(RTTI, 0) RTTICompound
 {
     __inherited uint32_t `RTTI::id`;
     __inherited enum RTTIKind `RTTI::kind`;
@@ -125,7 +125,7 @@ struct __base(RTTI, 0) RTTICompound __packed
     uint8_t attributes_len;
     uint8_t message_handelers_len;
     uint8_t message_order_entries_len;
-    __padding char _a[3];
+    uint8_t unk0;
     uint16_t version;
     uint32_t size;
     uint16_t alignment;
@@ -133,14 +133,11 @@ struct __base(RTTI, 0) RTTICompound __packed
     void* (* fn_constructor)(struct RTTI* rtti, void* result);
     void* (* fn_destructor)(struct RTTI* rtti, void* result);
     bool (* fn_from_string)(void* value, struct String& string);
+    void* unk1;
     bool (* fn_to_string)(void const* value, struct String& string);
-    __padding char _37[1];
-    __padding char _38[2];
     char const* type_name;
-    uint32_t cached_type_name_hash;
-    __padding char _46[2];
-    __padding char _48[8];
-    __padding char _50[2];
+    struct RTTI* next_type;
+    struct RTTI* prev_type;
     struct RTTICompound__Base* bases;
     struct RTTICompound__Attribute* attributes;
     struct RTTICompound__MessageHandler* message_handlers;

@@ -4,7 +4,7 @@ use crate::types::p_core::ggstring::GGString;
 use crate::types::p_core::gguuid::GGUUID;
 use bitflags::bitflags;
 use cauldron::mem::offset::Offset;
-use std::ffi::{CStr, c_char, c_void};
+use std::ffi::{CStr, CString, c_char, c_void};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u8)]
@@ -41,7 +41,7 @@ pub trait NamedRTTI {
     fn name(&self) -> String;
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[repr(C, packed(1))]
 pub struct RTTI {
     pub id: u32,
@@ -207,7 +207,8 @@ impl RTTI {
         .unwrap()
         .as_ptr::<extern "C" fn(*const c_char) -> *const RTTI>();
 
-        unsafe { &*(&*func)(name.as_ptr() as *const c_char) }
+        let name = CString::new(name).unwrap();
+        unsafe { &*(&*func)(name.as_ptr()) }
     }
 }
 
@@ -650,13 +651,11 @@ pub struct RTTICompoundMessageOrderEntry {
 #[repr(C)]
 pub struct RTTICompound {
     pub base: RTTI,
-
     pub bases_len: u8,
     pub attributes_len: u8,
     pub message_handlers_len: u8,
     pub message_order_entries_len: u8,
-
-    _pad: [u8; 0x3],
+    _pad: u8,
     pub version: u16,
     pub size: u32,
     pub alignment: u16,
@@ -664,13 +663,11 @@ pub struct RTTICompound {
     pub fn_constructor: FnRTTIConstructor,
     pub fn_destructor: FnRTTIDestructor,
     pub fn_from_string: FnRTTIFromGGString,
+    pub unk0: *const c_void,
     pub fn_to_string: FnRTTIToGGString,
-
-    _pad1: [u8; 0x3],
     pub type_name: *const c_char,
-    pub cached_type_name_hash: u32,
-
-    _pad2: [u8; 0xC],
+    pub next_type: *const RTTI,
+    pub prev_type: *const RTTI,
     pub bases: *const RTTICompoundBase,
     pub attributes: *const RTTICompoundAttribute,
     pub message_handlers: *const RTTICompoundMessageHandler,
@@ -681,7 +678,7 @@ pub struct RTTICompound {
     pub ordered_attributes_len: u32,
     pub message_read_binary: RTTICompoundMessageHandler,
     pub message_read_binary_offset: u32,
-    pub unk0: u32,
+    pub unk1: u32,
 }
 assert_size!(RTTICompound, 0xb0);
 
