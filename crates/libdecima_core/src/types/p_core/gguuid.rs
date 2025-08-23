@@ -24,7 +24,7 @@ pub struct GGUUID {
 impl Display for GGUUID {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!(
-            "{:2x}{:2x}{:2x}{:2x}-{:2x}{:2x}-{:2x}{:2x}-{:2x}{:2x}-{:2x}{:2x}{:2x}{:2x}{:2x}{:2x}",
+            "{:0<2x}{:0<2x}{:0<2x}{:0<2x}-{:0<2x}{:0<2x}-{:0<2x}{:0<2x}-{:0<2x}{:0<2x}-{:0<2x}{:0<2x}{:0<2x}{:0<2x}{:0<2x}{:0<2x}",
             self.data0,
             self.data1,
             self.data2,
