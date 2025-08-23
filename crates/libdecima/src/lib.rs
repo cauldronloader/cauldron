@@ -5,7 +5,8 @@ use libdecima_core::types::core::exported_symbols::{ExportedSymbolKind, Exported
 use std::time::Duration;
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> bool {
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn CauldronMod_Load(loader_api: *const CauldronApi) -> bool {
     let loader = unsafe { &*loader_api };
     init_mod_logger(loader).expect("libdecima: failed to initialize mod logger.");
 
@@ -96,7 +97,8 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn cauldron_mod__info() -> *const CauldronModInfo {
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn CauldronMod_Info() -> *const CauldronModInfo {
     let info = Box::new(
         CauldronModInfo::builder("libdecima", env!("CARGO_PKG_VERSION"))
             .dependency(CauldronModDependency::new("hfw", Some(">=1.5.80"), false))

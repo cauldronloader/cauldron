@@ -247,7 +247,8 @@ fn engine_import_type_impl(symbol_hash: u32, symbols: *mut ExportedSymbols) -> *
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> bool {
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn CauldronMod_Load(loader_api: *const CauldronApi) -> bool {
     let loader = unsafe { &*loader_api };
     init_mod_logger(loader).expect("pulse: failed to initialize mod logger.");
 
@@ -302,7 +303,8 @@ pub unsafe extern "C" fn cauldron_mod__load(loader_api: *const CauldronApi) -> b
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn cauldron_mod__info() -> *const CauldronModInfo {
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn CauldronMod_Info() -> *const CauldronModInfo {
     let info = Box::new(
         CauldronModInfo::builder("pulse", env!("CARGO_PKG_VERSION"))
             .display_name("Pulse")

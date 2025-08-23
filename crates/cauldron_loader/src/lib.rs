@@ -244,7 +244,7 @@ unsafe fn loader_initialize() {
             let lib = unsafe { Library::new(&path).unwrap() };
 
             let info_func: Symbol<unsafe extern "C" fn() -> *const CauldronModInfo> =
-                unsafe { lib.get(b"cauldron_mod__info\0").unwrap() };
+                unsafe { lib.get(b"CauldronMod_Info\0").unwrap() };
 
             let mod_info = unsafe { &*info_func() };
             let mod_info = SafeCauldronModInfo::from(mod_info.clone());
@@ -376,7 +376,7 @@ unsafe fn loader_initialize() {
 
     for (lib, _) in &loading_mods {
         let init_func: Symbol<unsafe extern "C" fn(*const CauldronApi) -> bool> =
-            unsafe { lib.get(b"cauldron_mod__load\0").unwrap() };
+            unsafe { lib.get(b"CauldronMod_Load\0").unwrap() };
 
         let _load_status = unsafe { init_func(&LOADER_API as *const CauldronApi) };
         // todo(py): handle mod load failure
