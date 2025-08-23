@@ -1,8 +1,10 @@
+use std::ffi::c_void;
 use cauldron::CauldronApi;
 use cauldron::log::init_mod_logger;
 use cauldron::prelude::{CauldronModDependency, CauldronModInfo};
 use libdecima_core::types::core::exported_symbols::{ExportedSymbolKind, ExportedSymbols};
 use std::time::Duration;
+use cauldron::mem::offset::Offset;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case)]
@@ -22,7 +24,14 @@ pub unsafe extern "C" fn CauldronMod_Load(loader_api: *const CauldronApi) -> boo
     let mut pointer_count: u32 = 0;
     let mut source_file_count: u32 = 0;
 
+    if let Ok(offset) = Offset::from_signature("48 89 5C 24 ? 57 48 83 EC ? 48 8D 7A ? 89 4C 24 ?")
+    {
+        let offset = offset.as_ptr::<c_void>();
+        loader.register("libdecima/engine/functions", "Importer", offset);
+    }
+
     let symbols = ExportedSymbols::get().expect("libdecima: failed to get exported symbols");
+    loader.register("libdecima/engine/variables", "ExportedSymbols", symbols as *const ExportedSymbols as *mut ExportedSymbols as *mut c_void);
     for group in symbols.groups.as_slice() {
         let group = unsafe { &**group };
         for symbol in group.symbols.as_slice() {
