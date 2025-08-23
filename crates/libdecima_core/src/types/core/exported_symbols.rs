@@ -288,4 +288,29 @@ impl ExportedSymbols {
         }
         None
     }
+
+    pub fn import_symbol(symbol: u32) -> Option<*mut c_void> {
+        match Self::get() {
+            None => None,
+            Some(symbols) => {
+                let Ok(importer) = Offset::from_signature("48 89 5C 24 ? 57 48 83 EC 20 48 8D 7A ? 89 4C 24") else {
+                    return None;
+                };
+
+                let importer: extern "C" fn(u32, *mut ExportedSymbols) -> *mut c_void = unsafe { std::mem::transmute(importer.as_ptr::<extern "C" fn(u32, *mut ExportedSymbols) -> *mut c_void>()) };
+
+                let ptr = importer(symbol, symbols as *const ExportedSymbols as *mut ExportedSymbols);
+                if ptr.is_null() {
+                    None
+                } else {
+                    Some(ptr)
+                }
+            }
+        }
+    }
+
+    /// 0x40506d26, fn(ptr: *mut c_void);
+    pub const G_MEM_FREE: u32 = 0x40506d26;
+    /// 0xda6ab4e, fn(size: u64) -> *mut c_void;
+    pub const G_MEM_ALLOC: u32 = 0xda6ab4e;
 }
