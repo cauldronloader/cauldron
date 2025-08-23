@@ -1,3 +1,6 @@
 [alias]
 xtask = "run --package heph --"
 heph = "run --package heph --"
+
+[build]
+rustflags = ["-C", "target-cpu=native"] # enable SIMD
