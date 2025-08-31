@@ -101,17 +101,13 @@ fn bn_kind_name(kind: &RTTIKind) -> String {
     .to_string()
 }
 
-fn bn_symbol_name(rtti: &RTTI) -> String {
-    rtti.get_symbol_name().replace("<", "__").replace(">", "")
-}
-
 fn export_type(
     file: &mut File,
     rtti: &RTTI,
     containers: &mut Vec<*const RTTIContainerData>,
 ) -> anyhow::Result<()> {
     let kind_str = bn_kind_name(&rtti.kind);
-    let type_str = bn_symbol_name(&rtti);
+    let type_str = rtti.get_symbol_name();
 
     writeln!(file, "# {type_str} ({kind_str})")?;
 
@@ -121,7 +117,7 @@ fn export_type(
         if !bases.is_null() {
             writeln!(
                 file,
-                "bv.define_data_var({bases:p}, ArrayType.create(bv.types[\"RTTICompound__Base\"], {bases_len}),\"RTTI_{type_str}__bases\")"
+                "bv.define_data_var({bases:p}, ArrayType.create(bv.types[\"RTTICompound::Base\"], {bases_len}),\"RTTI_{type_str}__bases\")"
             )?;
         }
 
@@ -130,7 +126,7 @@ fn export_type(
         if !attrs.is_null() {
             writeln!(
                 file,
-                "bv.define_data_var({attrs:p}, ArrayType.create(bv.types[\"RTTICompound__Attribute\"], {attrs_len}), \"RTTI_{type_str}__attributes\")"
+                "bv.define_data_var({attrs:p}, ArrayType.create(bv.types[\"RTTICompound::Attribute\"], {attrs_len}), \"RTTI_{type_str}__attributes\")"
             )?;
         }
 
@@ -139,7 +135,7 @@ fn export_type(
         if !msg_handlers.is_null() {
             writeln!(
                 file,
-                "bv.define_data_var({msg_handlers:p}, ArrayType.create(bv.types[\"RTTICompound__MessageHandler\"], {msg_handlers_len}), \"RTTI_{type_str}__message_handlers\")"
+                "bv.define_data_var({msg_handlers:p}, ArrayType.create(bv.types[\"RTTICompound::MessageHandler\"], {msg_handlers_len}), \"RTTI_{type_str}__message_handlers\")"
             )?;
         }
 
@@ -148,7 +144,7 @@ fn export_type(
         if !msg_order_entries.is_null() {
             writeln!(
                 file,
-                "bv.define_data_var({msg_order_entries:p}, ArrayType.create(bv.types[\"RTTICompound__MessageOrderEntry\"], {msg_order_entries_len}), \"RTTI_{type_str}__message_order_entries\")"
+                "bv.define_data_var({msg_order_entries:p}, ArrayType.create(bv.types[\"RTTICompound::MessageOrderEntry\"], {msg_order_entries_len}), \"RTTI_{type_str}__message_order_entries\")"
             )?;
         }
 
@@ -157,7 +153,7 @@ fn export_type(
         if !ordered_attrs.is_null() {
             writeln!(
                 file,
-                "bv.define_data_var({ordered_attrs:p}, ArrayType.create(bv.types[\"RTTICompound__OrderedAttribute\"], {ordered_attrs_len}), \"RTTI_{type_str}__ordered_attributes\")"
+                "bv.define_data_var({ordered_attrs:p}, ArrayType.create(bv.types[\"RTTICompound::OrderedAttribute\"], {ordered_attrs_len}), \"RTTI_{type_str}__ordered_attributes\")"
             )?;
         }
     }
@@ -168,7 +164,7 @@ fn export_type(
         if !values.is_null() {
             writeln!(
                 file,
-                "bv.define_data_var({values:p}, ArrayType.create(bv.types[\"RTTIEnum__Value\"], {values_len}), \"RTTI_{type_str}__values\")"
+                "bv.define_data_var({values:p}, ArrayType.create(bv.types[\"RTTIEnum::Value\"], {values_len}), \"RTTI_{type_str}__values\")"
             )?;
         }
     }
@@ -179,20 +175,19 @@ fn export_type(
             let data = container.container_type;
             let container_name = unsafe {
                 CStr::from_ptr((&*data).type_name)
-                    .to_str()
-                    .unwrap()
+                    .to_str()?
                     .to_owned()
             };
 
             if container.base.kind == RTTIKind::Pointer {
                 writeln!(
                     file,
-                    "bv.define_data_var({data:p}, \"RTTIPointer__Data\", \"RTTIPointer_{container_name}\")"
+                    "bv.define_data_var({data:p}, \"`RTTIPointer::Data`\", \"RTTIPointer_{container_name}\")"
                 )?;
             } else {
                 writeln!(
                     file,
-                    "bv.define_data_var({data:p}, \"RTTIContainer__Data\", \"RTTIContainer_{container_name}\")"
+                    "bv.define_data_var({data:p}, \"`RTTIContainer::Data`\", \"RTTIContainer_{container_name}\")"
                 )?;
             }
         }

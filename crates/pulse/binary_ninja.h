@@ -65,17 +65,17 @@ struct __base(RTTI, 0) RTTIAtom
     struct RTTI* representation_type;
 };
 
-enum RTTICompound__Attribute__Flags : uint16_t
+enum `RTTICompound::Attribute::Flags` : uint16_t
 {
     ATTR_DONT_SERIALIZE_BINARY = 0x2,
     ARRT_VALID_FLAG_MASK = 0xdeb
 };
 
-struct RTTICompound__Attribute
+struct `RTTICompound::Attribute``
 {
     struct RTTI* type;
     uint16_t offset;
-    enum RTTICompound__Attribute__Flags flags;
+    enum `RTTICompound::Attribute::Flags` flags;
     char const* name;
     void (* fn_get)(void const* compound, void* value);
     void (* fn_set)(void* compound, void const* value);
@@ -83,33 +83,33 @@ struct RTTICompound__Attribute
     char const* max;
 };
 
-struct __base(RTTICompound__Attribute, 0) RTTICompound__OrderedAttribute
+struct __base(`RTTICompound::Attribute`, 0) `RTTICompound::OrderedAttribute``
 {
-    __inherited struct RTTI* `RTTICompound__Attribute::type`;
-    __inherited uint16_t `RTTICompound__Attribute::offset`;
-    __inherited enum RTTICompound__Attribute__Flags `RTTICompound__Attribute::flags`;
-    __inherited char const* `RTTICompound__Attribute::name`;
-    __inherited void (* `RTTICompound__Attribute::fn_get`)(void const* compound, void* value);
-    __inherited void (* `RTTICompound__Attribute::fn_set`)(void* compound, void const* value);
-    __inherited char const* `RTTICompound__Attribute::min`;
-    __inherited char const* `RTTICompound__Attribute::max`;
+    __inherited struct RTTI* `RTTICompound::Attribute::type`;
+    __inherited uint16_t `RTTICompound::Attribute::offset`;
+    __inherited enum RTTICompound::Attribute::Flags `RTTICompound::Attribute::flags`;
+    __inherited char const* `RTTICompound::Attribute::name`;
+    __inherited void (* `RTTICompound::Attribute::fn_get`)(void const* compound, void* value);
+    __inherited void (* `RTTICompound::Attribute::fn_set`)(void* compound, void const* value);
+    __inherited char const* `RTTICompound::Attribute::min`;
+    __inherited char const* `RTTICompound::Attribute::max`;
     struct RTTI* parent;
     char const* group;
 };
 
-struct RTTICompound__Base
+struct `RTTICompound::Base`
 {
     struct RTTI* type;
     uint32_t offset;
 };
 
-struct RTTICompound__MessageHandler
+struct `RTTICompound::MessageHandler`
 {
     struct RTTI* message;
     void (* handler)(void*, void*);
 };
 
-struct RTTICompound__MessageOrderEntry
+struct `RTTICompound::MessageOrderEntry`
 {
     bool before;
     struct RTTI* message;
@@ -138,20 +138,20 @@ struct __base(RTTI, 0) RTTICompound
     char const* type_name;
     struct RTTI* next_type;
     struct RTTI* prev_type;
-    struct RTTICompound__Base* bases;
-    struct RTTICompound__Attribute* attributes;
-    struct RTTICompound__MessageHandler* message_handlers;
-    struct RTTICompound__MessageOrderEntry* message_order_entries;
+    struct `RTTICompound::Base`* bases;
+    struct `RTTICompound::Attribute`* attributes;
+    struct `RTTICompound::MessageHandler`* message_handlers;
+    struct `RTTICompound::MessageOrderEntry`* message_order_entries;
     struct RTTI* (* fn_get_symbol_group)();
     struct RTTI* pod_optimised_type;
-    struct RTTICompound__OrderedAttribute* ordered_attributes;
+    struct `RTTICompound::OrderedAttribute`* ordered_attributes;
     uint32_t ordered_attributes_len;
-    struct RTTICompound__MessageHandler message_read_binary;
+    struct `RTTICompound::MessageHandler` message_read_binary;
     uint32_t message_read_binary_offset;
     uint32_t unk;
 };
 
-struct RTTIContainer__Data
+struct `RTTIContainer::Data`
 {
     char const* type_name;
     uint16_t size;
@@ -185,11 +185,11 @@ struct __base(RTTI, 0) RTTIContainer
     __inherited enum RTTIFlags `RTTI::flags`;
     bool has_pointers;
     struct RTTI* item;
-    struct RTTIContainer__Data* container;
+    struct `RTTIContainer::Data`* container;
     char const* type_name;
 };
 
-struct RTTIPointer__Data
+struct `RTTIPointer::Data`
 {
     char const* type_name;
     uint16_t size;
@@ -208,11 +208,11 @@ struct __base(RTTI, 0) RTTIPointer
     __inherited enum RTTIFlags `RTTI::flags`;
     bool has_pointers;
     struct RTTI* item;
-    struct RTTIPointer__Data* pointer;
+    struct `RTTIPointer::Data`* pointer;
     char const* type_name;
 };
 
-struct RTTIEnum__Value
+struct `RTTIEnum::Value`
 {
     int32_t value;
     char const* name;
@@ -228,7 +228,7 @@ struct __base(RTTI, 0) RTTIEnum
     uint8_t alignment;
     uint16_t values_len;
     char const* type_name;
-    struct RTTIEnum__Value* values;
+    struct `RTTIEnum::Value`* values;
     struct RTTI* pod_optimised_type;
 };
 
