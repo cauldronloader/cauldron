@@ -640,6 +640,7 @@ dependencies = [
 name = "cauldron_metadata"
 version = "0.1.0-alpha"
 dependencies = [
+ "semver",
  "serde",
  "thiserror 2.0.17",
  "toml",

@@ -3,22 +3,23 @@
 /// Utilities for reading and parsing [CauldronModMetadata] files.
 pub mod read;
 
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 /// Rust representation of a `<name>.mod.toml` metadata file.
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct CauldronModMetadata {
     pub r#mod: ModSpec,
 }
 
 /// The core mod specification.
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct ModSpec {
     /// Unique identifier for the mod.
     /// Must match `[a-z0-9_-]{3,64}`.
     pub name: String,
     /// Semver-compliant version.
-    pub version: String,
+    #[serde(deserialize_with = "read::deserialize_version")]
+    pub version: semver::Version,
 
     /// Human-readable display name.
     pub display_name: Option<String>,
@@ -42,13 +43,14 @@ pub struct ModSpec {
 }
 
 /// A mod's dependency specification.
-#[derive(Debug, Clone, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DependencySpec {
     /// Dependency name.
     /// Matched against [ModSpec::name].
     pub name: String,
     /// A Semver version constraint.
-    pub version: String,
+    #[serde(deserialize_with = "read::deserialize_version_req")]
+    pub version: semver::VersionReq,
     /// Dependency order specification.
     pub order: DependencyOrderSpec,
     /// Whether the dependency is optional.
@@ -56,7 +58,7 @@ pub struct DependencySpec {
 }
 
 /// Dependency load order specification.
-#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[derive(Debug, Clone, Deserialize, Default)]
 pub enum DependencyOrderSpec {
     /// Place the dependency before the mod in the load order. (Default)
     #[default]
