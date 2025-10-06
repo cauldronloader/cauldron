@@ -173,11 +173,7 @@ fn export_type(
         if !unsafe { containers.contains(&std::mem::transmute(container.container_type)) } {
             unsafe { containers.push(std::mem::transmute(container.container_type)) };
             let data = container.container_type;
-            let container_name = unsafe {
-                CStr::from_ptr((&*data).type_name)
-                    .to_str()?
-                    .to_owned()
-            };
+            let container_name = unsafe { CStr::from_ptr((&*data).type_name).to_str()?.to_owned() };
 
             if container.base.kind == RTTIKind::Pointer {
                 writeln!(

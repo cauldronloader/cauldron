@@ -27,7 +27,9 @@ impl CauldronModMetadata {
 }
 
 /// A [serde::Deserializer] for a [semver::Version].
-pub fn deserialize_version<'de, D>(deserializer: D) -> std::result::Result<semver::Version, D::Error>
+pub fn deserialize_version<'de, D>(
+    deserializer: D,
+) -> std::result::Result<semver::Version, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
@@ -35,7 +37,9 @@ where
 }
 
 /// A [serde::Deserializer] for a [semver::VersionReq].
-pub fn deserialize_version_req<'de, D>(deserializer: D) -> std::result::Result<semver::VersionReq, D::Error>
+pub fn deserialize_version_req<'de, D>(
+    deserializer: D,
+) -> std::result::Result<semver::VersionReq, D::Error>
 where
     D: serde::Deserializer<'de>,
 {
