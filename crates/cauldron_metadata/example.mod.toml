@@ -1,0 +1,16 @@
+[mod]
+name = "example"
+version = "0.1.0-alpha"
+display_name = "Example Mod"
+authors = ["Pyrrha Wills <pyrrhawills@gmail.com>"]
+description = "An example Cauldron mod."
+license = "GPL-3.0"
+homepage = "https://cauldron.tallneck.app"
+repository = "https://github.com/cauldronloader/cauldron"
+issue_tracker = "https://github.com/cauldronloader/cauldron/issues"
+
+[[mod.dependencies]]
+name = "hfw"
+version = ">=1.5.80+0"
+order = "Before"
+optional = false

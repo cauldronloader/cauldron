@@ -1,0 +1,12 @@
+[package]
+name = "cauldron_metadata"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+thiserror = "2.0.17"
+toml = "0.9.7"

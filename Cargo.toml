@@ -13,6 +13,7 @@ documentation = "https://cauldron.tallneck.app"
 cauldron = { path = "crates/cauldron" }
 cauldron_config = { path = "crates/cauldron_config" }
 cauldron_game_detection = { path = "crates/cauldron_game_detection" }
+cauldron_metadata = { path = "crates/cauldron_metadata" }
 libdecima_core = { path = "crates/libdecima_core" }
 
 anyhow = "1.0.98"
