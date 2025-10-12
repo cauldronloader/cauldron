@@ -18,7 +18,7 @@ libdecima_core = { path = "crates/libdecima_core" }
 
 anyhow = "1.0.100"
 bitflags = "2.9.4"
-libc = "1.0.0-alpha.1"
+libc = "0.2.177"
 log = "0.4.28"
 once_cell = "1.21.3"
 retour = "0.4.0-alpha.4"
