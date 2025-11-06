@@ -1,15 +1,13 @@
 [package]
-name = "libdecima"
+name = "cauldron_metadata"
 edition.workspace = true
 version.workspace = true
 authors.workspace = true
 description.workspace = true
 documentation.workspace = true
 
-[lib]
-crate-type = ["cdylib"]
-
 [dependencies]
-cauldron.workspace = true
-libdecima_core.workspace = true
-log.workspace = true
+serde = { workspace = true, features = ["derive"] }
+semver.workspace = true
+thiserror.workspace = true
+toml = "0.9.8"

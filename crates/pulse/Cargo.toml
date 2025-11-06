@@ -1,23 +1,21 @@
 [package]
 name = "pulse"
-version.workspace = true
 edition.workspace = true
+version.workspace = true
 authors.workspace = true
-description = "A Cauldron plugin to dump GGRTTI types."
+description.workspace = true
+documentation.workspace = true
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-cauldron.workspace = true
 anyhow.workspace = true
-json-writer = "0.4.0"
-libdecima.workspace = true
-minhook.workspace = true
+cauldron.workspace = true
+libdecima_core.workspace = true
+log.workspace = true
 once_cell.workspace = true
-
-[features]
-default = []
-
-# enable int3 software breakpoints
-debug_breakpoints = []
+retour = { workspace = true, features = ["static-detour"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true
+bitflags.workspace = true

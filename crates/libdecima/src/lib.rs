@@ -1,146 +1,121 @@
-#![feature(once_cell_get_mut)]
-// #![feature(macro_metavar_expr_concat)]
-#![allow(static_mut_refs)]
+use cauldron::CauldronApi;
+use cauldron::log::init_mod_logger;
+use cauldron::mem::offset::Offset;
+use cauldron::prelude::{CauldronModDependency, CauldronModInfo};
+use libdecima_core::types::core::exported_symbols::{ExportedSymbolKind, ExportedSymbols};
+use std::ffi::c_void;
 
-#[doc(include = "../README.md")]
-#[cfg(not(any(feature = "hfw", feature = "nixxes")))]
-compile_error!("At least one target feature must be enabled.");
+#[unsafe(no_mangle)]
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn CauldronMod_Load(loader_api: *const CauldronApi) -> bool {
+    let loader = unsafe { &*loader_api };
+    init_mod_logger(loader).expect("libdecima: failed to initialize mod logger.");
 
-pub mod mem;
-pub mod types;
-pub mod util;
+    let mut atom_count: u32 = 0;
+    let mut enum_count: u32 = 0;
+    let mut class_count: u32 = 0;
+    let mut struct_count: u32 = 0;
+    let mut typedef_count: u32 = 0;
+    let mut function_count: u32 = 0;
+    let mut variable_count: u32 = 0;
+    let mut container_count: u32 = 0;
+    let mut reference_count: u32 = 0;
+    let mut pointer_count: u32 = 0;
+    let mut source_file_count: u32 = 0;
 
-pub mod macros {
-    #[macro_export]
-    macro_rules! assert_size {
-        ($t:ty, $n:literal) => {
-            const _: () = [(); 1][(::core::mem::size_of::<$t>() == $n) as usize ^ 1];
-        };
+    if let Ok(offset) = Offset::from_signature("48 89 5C 24 ? 57 48 83 EC ? 48 8D 7A ? 89 4C 24 ?")
+    {
+        let offset = offset.as_ptr::<c_void>();
+        loader.register("libdecima/engine/functions", "Importer", offset);
     }
 
-    #[macro_export]
-    macro_rules! assert_offset {
-        ($t:ty, $f:expr, $n:literal) => {
-            const _: () = [(); 1][(::std::mem::offset_of!($t, $f) == $n) as usize ^ 1];
-        };
-    }
+    let symbols = ExportedSymbols::get().expect("libdecima: failed to get exported symbols");
+    loader.register(
+        "libdecima/engine/variables",
+        "ExportedSymbols",
+        symbols as *const ExportedSymbols as *mut ExportedSymbols as *mut c_void,
+    );
+    for group in symbols.groups.as_slice() {
+        let group = unsafe { &**group };
+        for symbol in group.symbols.as_slice() {
+            let namespace = symbol.namespace().unwrap_or_default();
+            let name = symbol
+                .exported_definition
+                .name()
+                .unwrap_or(symbol.name().unwrap());
 
-    #[macro_export]
-    macro_rules! gen_with_vtbl {
-        (
-            $name:ident,
-            $name_vtbl:ident,
-            $(
-                fn $func:ident($($arg:ident: $arg_t:ty),*) $(-> $func_ret:ty)?
-            );*;
-            $(
-                pub $field:ident: $field_t:ty
-            ),*,
-        ) => {
-            #[repr(C)]
-            #[derive(Debug)]
-            #[allow(non_camel_case_types, non_snake_case)]
-            pub struct /* VFT */ /*$ {concat($name, _vtbl)}*/ $name_vtbl {
-                $(
-                    pub $func: extern "C" fn(this: *mut $name $(, $arg: $arg_t)*) $(-> $func_ret)?
-                ),*
-            }
-
-            #[repr(C)]
-            #[derive(Debug)]
-            pub struct $name {
-                pub __vftable: *mut /*$ {concat($name, _vtbl)}*/ $name_vtbl,
-                $(
-                    pub $field: $field_t
-                ),*
-            }
-
-            impl $name {
-                pub fn __vftable<'a>(this: *mut $name) -> &'a /*$ {concat($name, _vtbl)}*/ $name_vtbl {
-                    let instance = unsafe { &*this };
-                    let vftable = unsafe { &*instance.__vftable };
-                    vftable
+            match symbol.kind {
+                ExportedSymbolKind::Atom => {
+                    atom_count += 1;
                 }
-
-                $(
-                    #[allow(non_snake_case)]
-                    pub fn $func(this: *mut $name $(, $arg: $arg_t)*) $(-> $func_ret)? {
-                        let vftable = Self::__vftable(this as *const _ as *mut _);
-                        (vftable.$func)(this $(, $arg)*)
-                    }
-                )*
-            }
-        };
-    }
-
-    #[macro_export]
-    macro_rules! impl_instance {
-        ($name:ident, $signature:literal, $instruction_length:literal) => {
-            impl $name {
-                pub fn get_instance() -> Option<&'static $name> {
-                    let ptr = crate::mem::offsets::Offset::from_signature($signature)
-                        .unwrap()
-                        .as_relative($instruction_length)
-                        .as_ptr::<*mut $name>();
-                    if !ptr.is_null() {
-                        let ptr = unsafe { *ptr };
-                        if !ptr.is_null() {
-                            let instance = unsafe { &*ptr };
-                            return Some(instance);
-                        }
-                    }
-                    None
+                ExportedSymbolKind::Enum => {
+                    enum_count += 1;
+                }
+                ExportedSymbolKind::Class => {
+                    class_count += 1;
+                }
+                ExportedSymbolKind::Struct => {
+                    struct_count += 1;
+                }
+                ExportedSymbolKind::Typedef => {
+                    typedef_count += 1;
+                }
+                ExportedSymbolKind::Function => {
+                    loader.register(
+                        "libdecima/game/functions",
+                        format!("{namespace}/{name}").as_str(),
+                        symbol.exported_definition.address,
+                    );
+                    function_count += 1;
+                }
+                ExportedSymbolKind::Variable => {
+                    loader.register(
+                        "libdecima/game/variable",
+                        format!("{namespace}/{name}").as_str(),
+                        symbol.exported_definition.address,
+                    );
+                    variable_count += 1;
+                }
+                ExportedSymbolKind::Container => {
+                    container_count += 1;
+                }
+                ExportedSymbolKind::Reference => {
+                    reference_count += 1;
+                }
+                ExportedSymbolKind::Pointer => {
+                    pointer_count += 1;
+                }
+                ExportedSymbolKind::SourceFile => {
+                    source_file_count += 1;
                 }
             }
-        };
-        ($name:ident, $signature:literal) => {
-            impl_instance!($name, $signature, 7);
-        };
-    }
-}
-
-#[cfg(feature = "nixxes")]
-pub mod log {
-    use crate::types::nixxes::log::NxLogImpl;
-
-    pub fn log_impl(category: &str, text: &str) {
-        if let Some(log) = NxLogImpl::get_instance() {
-            NxLogImpl::fn_log(
-                log as *const _ as *mut _,
-                format!("{}\0", category).as_str().as_ptr() as *const _,
-                format!("{}\0", text).as_str().as_ptr() as *const _,
-            )
-        } else {
-            println!("[{category}] {text}");
         }
     }
 
-    #[macro_export]
-    macro_rules! log {
-        // log!("category", *format! args*);
-        ($category:literal, $($arg:tt)*) => {
-            $crate::log::log_impl($category, format!($($arg)*).as_str());
-        };
+    log::info!("Registered ExportedSymbols:");
+    log::info!("  Atoms: {atom_count}");
+    log::info!("  Enums: {enum_count}");
+    log::info!("  Classes: {class_count}");
+    log::info!("  Structs: {struct_count}");
+    log::info!("  Typedefs: {typedef_count}");
+    log::info!("  Functions: {function_count}");
+    log::info!("  Variables: {variable_count}");
+    log::info!("  Containers: {container_count}");
+    log::info!("  References: {reference_count}");
+    log::info!("  Pointers: {pointer_count}");
+    log::info!("  Source Files: {source_file_count}");
 
-        // log!(*format! args*);
-        ($($arg:tt)*) => {
-            $crate::log::log_impl(module_path!(), format!($($arg)*).as_str());
-        };
-    }
+    true
 }
 
-#[cfg(not(feature = "nixxes"))]
-pub mod log {
-    #[macro_export]
-    macro_rules! log {
-        // log!("category", *format! args*);
-        ($category:literal, $($arg:tt)*) => {
-            // todo: unimplemented
-        };
+#[unsafe(no_mangle)]
+#[allow(non_snake_case)]
+pub unsafe extern "C" fn CauldronMod_Info() -> *const CauldronModInfo {
+    let info = Box::new(
+        CauldronModInfo::builder("libdecima", env!("CARGO_PKG_VERSION"))
+            .dependency(CauldronModDependency::new("hfw", Some(">=1.5.80"), false))
+            .build(),
+    );
 
-        // log!(*format! args*);
-        ($($arg:tt)*) => {
-            // todo: unimplemented
-        };
-    }
+    Box::into_raw(info)
 }

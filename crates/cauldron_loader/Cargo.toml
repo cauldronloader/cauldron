@@ -1,0 +1,27 @@
+[package]
+name = "cauldron_loader"
+publish = false
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[lib]
+name = "cauldron"
+crate-type = ["cdylib"]
+
+[dependencies]
+cauldron.workspace = true
+cauldron_config.workspace = true
+cauldron_game_detection.workspace = true
+libloading = "0.8.9"
+log.workspace = true
+once_cell.workspace = true
+semver.workspace = true
+retour = { workspace = true, features = ["static-detour"] }
+simplelog = { version = "0.12.2", features = ["paris"] }
+windows-sys = { workspace = true, features = ["Win32_System_Console"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["Win32_UI_WindowsAndMessaging", "Win32_System_Console"] }

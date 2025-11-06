@@ -1,0 +1,17 @@
+[package]
+name = "cauldron_game_detection"
+publish = false
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+dotenvy = "0.15.7"
+keyvalues-serde = "0.2.2"
+serde = { workspace = true, features = ["derive"] }
+semver.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = ["Win32_Storage_FileSystem"] }

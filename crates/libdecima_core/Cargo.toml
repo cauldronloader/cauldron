@@ -1,0 +1,21 @@
+[package]
+name = "libdecima_core"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+
+[dependencies]
+bitflags.workspace = true
+cauldron.workspace = true
+libdecima_rtti.workspace = true
+windows = { workspace = true, features = ["Win32_System_Threading"] }
+
+[features]
+default = []
+
+hfw = []  # Horizon: Forbidden West
+hzd = []  # Horizon: Zero Dawn
+hzdr = [] # Horizon: Zero Dawn Remastered

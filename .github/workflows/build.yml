@@ -11,21 +11,37 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: Install Nightly
-        run: rustup toolchain install nightly --profile minimal
+      - name: Install Nightly and rustfmt
+        run: |
+          rustup toolchain install nightly --profile minimal
+          rustup component add rustfmt
       - name: Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          save-if: ${{ github.ref == 'refs/heads/main' }}
+        uses: actions/cache@v4
+        with: # https://doc.rust-lang.org/cargo/guide/cargo-home.html
+          path: |
+            $CARGO_HOME/.crates.toml
+            $CARGO_HOME/.crates2.json
+            $CARGO_HOME/bin
+            $CARGO_HOME/registry/index
+            $CARGO_HOME/registry/cache
+            $CARGO_HOME/git/db
+            ~/.cache/cargo-xwin
+            target/
+          key: ${{ runner.os }}-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - name: Add x86_64-pc-windows-msvc Target
         run: rustup target add x86_64-pc-windows-msvc
-      - name: (Temp Fix) Add catppuccin-whiskers
-        run: cargo install catppuccin-whiskers
+      - name: Install cargo-xwin
+        run: cargo install cargo-xwin
+      - name: Check formatting
+        run: cargo fmt --check
       - name: Build
-        run: cargo build --verbose
+        run: cargo heph --target-dir ./output/ -t hfw
