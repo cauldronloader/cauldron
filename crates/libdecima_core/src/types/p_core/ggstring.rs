@@ -35,8 +35,7 @@ impl GGString {
     fn internal_data(&self) -> &StringData {
         unsafe {
             &*std::ptr::with_exposed_provenance_mut::<StringData>(
-                std::mem::transmute::<*const c_char, usize>(self.data)
-                    - size_of::<StringData>(),
+                std::mem::transmute::<*const c_char, usize>(self.data) - size_of::<StringData>(),
             )
         }
     }

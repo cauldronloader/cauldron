@@ -4,10 +4,10 @@ use crate::types::p_core::hashmap::HashMap;
 use crate::{assert_size, gen_with_vtbl};
 use bitflags::bitflags;
 use cauldron::mem::offset::Offset;
+use libdecima_rtti::NamedRTTI;
 use libdecima_rtti::sys::DecimaRTTI;
 use std::ffi::{CStr, c_char, c_void};
 use std::fmt::{Display, Formatter};
-use libdecima_rtti::NamedRTTI;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 #[repr(u8)]

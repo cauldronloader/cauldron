@@ -44,23 +44,23 @@ pub(crate) fn export_types() -> anyhow::Result<()> {
                 alignment: r#enum.alignment,
                 type_name: r#enum.get_symbol_name(),
                 values: Vec::new(),
-/*                values: r#enum
-                    .values()
-                    .iter()
-                    .map(|v| ExportedEnumValue {
-                        value: v.value,
-                        name: unsafe { CStr::from_ptr(v.name).to_str().unwrap().to_owned() },
-                        aliases: v
-                            .aliases
-                            .iter()
-                            .map(|p| if p.is_null() { None } else { Some(p) })
-                            .filter(|p| p.is_some())
-                            .map(|p| unsafe {
-                                CStr::from_ptr(*p.unwrap()).to_str().unwrap().to_owned()
-                            })
-                            .collect::<Vec<_>>(),
-                    })
-                    .collect::<Vec<_>>(),*/
+                /*                values: r#enum
+                .values()
+                .iter()
+                .map(|v| ExportedEnumValue {
+                    value: v.value,
+                    name: unsafe { CStr::from_ptr(v.name).to_str().unwrap().to_owned() },
+                    aliases: v
+                        .aliases
+                        .iter()
+                        .map(|p| if p.is_null() { None } else { Some(p) })
+                        .filter(|p| p.is_some())
+                        .map(|p| unsafe {
+                            CStr::from_ptr(*p.unwrap()).to_str().unwrap().to_owned()
+                        })
+                        .collect::<Vec<_>>(),
+                })
+                .collect::<Vec<_>>(),*/
             });
         }
     }

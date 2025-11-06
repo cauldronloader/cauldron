@@ -1,7 +1,9 @@
 use libdecima_core::types::core::exported_symbols::{
     ExportedSymbolKind, ExportedSymbols, ExportedSymbolsGroup,
 };
-use libdecima_core::types::core::rtti::{DecimaRTTI, DecimaRTTIContainerData, DecimaRTTIKind, NamedRTTI};
+use libdecima_core::types::core::rtti::{
+    DecimaRTTI, DecimaRTTIContainerData, DecimaRTTIKind, NamedRTTI,
+};
 use std::collections::HashMap;
 use std::ffi::{CStr, c_void};
 use std::fs::File;
