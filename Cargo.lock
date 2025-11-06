@@ -75,9 +75,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
 
 [[package]]
 name = "bitflags"
-version = "2.9.4"
+version = "2.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2261d10cca569e4643e526d8dc2e62e433cc8aba21ab764233731f8d369bf394"
+checksum = "812e12b5285cc515a9c72a5c1d3b6d46a19dac5acfef5265968c166106e31dd3"
 
 [[package]]
 name = "cauldron"
@@ -449,7 +449,7 @@ dependencies = [
 name = "libdecima_core"
 version = "0.1.0-alpha"
 dependencies = [
- "bitflags 2.9.4",
+ "bitflags 2.10.0",
  "cauldron",
  "libdecima_rtti",
  "windows",
@@ -459,7 +459,7 @@ dependencies = [
 name = "libdecima_rtti"
 version = "0.1.0-alpha"
 dependencies = [
- "bitflags 2.9.4",
+ "bitflags 2.10.0",
 ]
 
 [[package]]
@@ -657,7 +657,7 @@ name = "pulse"
 version = "0.1.0-alpha"
 dependencies = [
  "anyhow",
- "bitflags 2.9.4",
+ "bitflags 2.10.0",
  "cauldron",
  "libdecima_core",
  "log",
