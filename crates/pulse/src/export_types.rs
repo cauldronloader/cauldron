@@ -1,11 +1,8 @@
-use crate::exported_type_defs::{ExportedEnumValue, ExportedType};
+use crate::exported_type_defs::ExportedType;
 use libdecima_core::types::core::factory_manager::FactoryManager;
-use libdecima_core::types::core::rtti::{NamedRTTI, RTTIKind};
+use libdecima_core::types::core::rtti::NamedRTTI;
 use std::cmp::Ordering;
-use std::collections::HashMap;
-use std::ffi::{CStr, c_char};
 use std::fs::File;
-use std::io::Write as _;
 
 pub(crate) fn export_types() -> anyhow::Result<()> {
     let mut exporting_types: Vec<ExportedType> = Vec::new();
@@ -31,22 +28,23 @@ pub(crate) fn export_types() -> anyhow::Result<()> {
     for ty in types {
         if let Some(atom) = ty.as_atom() {
             exporting_types.push(ExportedType::Atom {
-                id: atom.base.id,
-                factory_flags: atom.base.factory_flags.bits(),
+                id: atom.rtti_base.id,
+                factory_flags: atom.rtti_base.flags.bits(),
                 size: atom.size,
                 alignment: atom.alignment,
                 simple: atom.simple,
-                type_name: atom.name(),
-                base_type: unsafe { &*atom.base_type }.name(),
+                type_name: atom.get_symbol_name(),
+                base_type: unsafe { &*atom.parent_type }.get_symbol_name(),
             });
         } else if let Some(r#enum) = ty.as_enum() {
             exporting_types.push(ExportedType::Enum {
-                id: r#enum.base.id,
-                factory_flags: r#enum.base.factory_flags.bits(),
+                id: r#enum.rtti_base.id,
+                factory_flags: r#enum.rtti_base.flags.bits(),
                 size: r#enum.size,
                 alignment: r#enum.alignment,
-                type_name: r#enum.name(),
-                values: r#enum
+                type_name: r#enum.get_symbol_name(),
+                values: Vec::new(),
+/*                values: r#enum
                     .values()
                     .iter()
                     .map(|v| ExportedEnumValue {
@@ -62,7 +60,7 @@ pub(crate) fn export_types() -> anyhow::Result<()> {
                             })
                             .collect::<Vec<_>>(),
                     })
-                    .collect::<Vec<_>>(),
+                    .collect::<Vec<_>>(),*/
             });
         }
     }

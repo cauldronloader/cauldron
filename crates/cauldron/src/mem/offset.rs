@@ -28,11 +28,9 @@ impl Offset {
     }
 
     pub fn as_relative(&self, instruction_length: usize) -> Offset {
-        let rel_adjust = unsafe {
-            std::mem::transmute::<usize, *mut u32>(
-                self.0.add(instruction_length.sub(size_of::<u32>())),
-            )
-        };
+        let rel_adjust = std::ptr::with_exposed_provenance_mut::<u32>(
+            self.0.add(instruction_length.sub(size_of::<u32>())),
+        );
         let rel_adjust = unsafe { read_unaligned(rel_adjust) } as usize;
         let result = Offset(self.0.add(rel_adjust.add(instruction_length)));
         result

@@ -1,13 +1,13 @@
 use libdecima_core::types::core::exported_symbols::{
     ExportedSymbolKind, ExportedSymbols, ExportedSymbolsGroup,
 };
-use libdecima_core::types::core::rtti::{RTTI, RTTIContainerData, RTTIKind};
+use libdecima_core::types::core::rtti::{DecimaRTTI, DecimaRTTIContainerData, DecimaRTTIKind, NamedRTTI};
 use std::collections::HashMap;
 use std::ffi::{CStr, c_void};
 use std::fs::File;
 use std::io::Write as _;
 
-pub fn export_binary_ninja(types: Vec<&RTTI>) -> anyhow::Result<()> {
+pub fn export_binary_ninja(types: Vec<&DecimaRTTI>) -> anyhow::Result<()> {
     let mut output_file = File::create("cauldron/binary_ninja.py")?;
 
     writeln!(
@@ -88,23 +88,23 @@ def decima_tag_func(addr, tag):
     Ok(())
 }
 
-fn bn_kind_name(kind: &RTTIKind) -> String {
+fn bn_kind_name(kind: &DecimaRTTIKind) -> String {
     match kind {
-        RTTIKind::Atom => "RTTIAtom",
-        RTTIKind::Pointer => "RTTIPointer",
-        RTTIKind::Container => "RTTIContainer",
-        RTTIKind::Enum | RTTIKind::EnumFlags => "RTTIEnum",
-        RTTIKind::Compound => "RTTICompound",
-        RTTIKind::POD => "RTTIPod",
-        RTTIKind::EnumBitSet => "RTTIBitSet",
+        DecimaRTTIKind::Atom => "RTTIAtom",
+        DecimaRTTIKind::Pointer => "RTTIPointer",
+        DecimaRTTIKind::Container => "RTTIContainer",
+        DecimaRTTIKind::Enum | DecimaRTTIKind::FlagsEnum => "RTTIEnum",
+        DecimaRTTIKind::Compound => "RTTICompound",
+        DecimaRTTIKind::Pod => "RTTIPod",
+        DecimaRTTIKind::BitSetEnum => "RTTIBitSet",
     }
     .to_string()
 }
 
 fn export_type(
     file: &mut File,
-    rtti: &RTTI,
-    containers: &mut Vec<*const RTTIContainerData>,
+    rtti: &DecimaRTTI,
+    containers: &mut Vec<*const DecimaRTTIContainerData>,
 ) -> anyhow::Result<()> {
     let kind_str = bn_kind_name(&rtti.kind);
     let type_str = rtti.get_symbol_name();
@@ -112,7 +112,7 @@ fn export_type(
     writeln!(file, "# {type_str} ({kind_str})")?;
 
     if let Some(compound) = rtti.as_compound() {
-        let bases_len = compound.bases_len as usize;
+        let bases_len = compound.bases_length as usize;
         let bases = compound.bases;
         if !bases.is_null() {
             writeln!(
@@ -121,7 +121,7 @@ fn export_type(
             )?;
         }
 
-        let attrs_len = compound.attributes_len as usize;
+        let attrs_len = compound.attributes_length as usize;
         let attrs = compound.attributes;
         if !attrs.is_null() {
             writeln!(
@@ -130,7 +130,7 @@ fn export_type(
             )?;
         }
 
-        let msg_handlers_len = compound.message_handlers_len as usize;
+        let msg_handlers_len = compound.message_handlers_length as usize;
         let msg_handlers = compound.message_handlers;
         if !msg_handlers.is_null() {
             writeln!(
@@ -139,7 +139,7 @@ fn export_type(
             )?;
         }
 
-        let msg_order_entries_len = compound.message_order_entries_len as usize;
+        let msg_order_entries_len = compound.message_order_entries_length as usize;
         let msg_order_entries = compound.message_order_entries;
         if !msg_order_entries.is_null() {
             writeln!(
@@ -148,7 +148,7 @@ fn export_type(
             )?;
         }
 
-        let ordered_attrs_len = compound.ordered_attributes_len as usize;
+        let ordered_attrs_len = compound.ordered_attributes_length as usize;
         let ordered_attrs = compound.ordered_attributes;
         if !ordered_attrs.is_null() {
             writeln!(
@@ -160,7 +160,7 @@ fn export_type(
 
     if let Some(r#enum) = rtti.as_enum() {
         let values = r#enum.values;
-        let values_len = r#enum.values_len as usize;
+        let values_len = r#enum.values_length as usize;
         if !values.is_null() {
             writeln!(
                 file,
@@ -175,7 +175,7 @@ fn export_type(
             let data = container.container_type;
             let container_name = unsafe { CStr::from_ptr((&*data).type_name).to_str()?.to_owned() };
 
-            if container.base.kind == RTTIKind::Pointer {
+            if container.rtti_base.kind == DecimaRTTIKind::Pointer {
                 writeln!(
                     file,
                     "bv.define_data_var({data:p}, \"`RTTIPointer::Data`\", \"RTTIPointer_{container_name}\")"

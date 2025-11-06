@@ -1,12 +1,13 @@
-use crate::types::core::rtti::RTTI;
 use crate::types::p_core::array::Array;
 use crate::types::p_core::ggstring::GGString;
 use crate::types::p_core::hashmap::HashMap;
 use crate::{assert_size, gen_with_vtbl};
 use bitflags::bitflags;
 use cauldron::mem::offset::Offset;
+use libdecima_rtti::sys::DecimaRTTI;
 use std::ffi::{CStr, c_char, c_void};
 use std::fmt::{Display, Formatter};
+use libdecima_rtti::NamedRTTI;
 
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd)]
 #[repr(u8)]
@@ -57,7 +58,7 @@ bitflags! {
 pub struct ExportedSymbolToken {
     pub type_name: *const c_char,
     pub modifiers: *const c_char,
-    pub r#type: *mut RTTI,
+    pub r#type: *mut DecimaRTTI,
     pub name: *const c_char,
     pub flags: ExportedSymbolSignatureFlags,
 }
@@ -210,10 +211,10 @@ bitflags! {
 #[repr(C)]
 pub struct ExportedSymbol {
     pub kind: ExportedSymbolKind,
-    pub r#type: *const RTTI,
+    pub r#type: *const DecimaRTTI,
     pub namespace: *const c_char,
     pub name: *const c_char,
-    pub size_type: *const RTTI,
+    pub size_type: *const DecimaRTTI,
     pub flags: ExportedSymbolFlags,
     pub exported_definition: ExportedSymbolDefinition,
     pub internal_definition: ExportedSymbolDefinition,
@@ -262,7 +263,7 @@ gen_with_vtbl!(
     pub export_mask: u32,
     pub namespace: *const c_char,
     pub symbols: Array<ExportedSymbol>,
-    pub dependencies: Array<*const RTTI>,
+    pub dependencies: Array<*const DecimaRTTI>,
 );
 assert_size!(ExportedSymbolsGroup, 0x38);
 
@@ -270,8 +271,8 @@ assert_size!(ExportedSymbolsGroup, 0x38);
 #[repr(C)]
 pub struct ExportedSymbols {
     pub groups: Array<*mut ExportedSymbolsGroup>,
-    pub dependencies1: Array<*const RTTI>,
-    pub dependencies2: Array<*const RTTI>,
+    pub dependencies1: Array<*const DecimaRTTI>,
+    pub dependencies2: Array<*const DecimaRTTI>,
     pub all_symbols: HashMap<*mut ExportedSymbol, u32>,
     pub type_symbols: HashMap<GGString, *mut ExportedSymbol>,
 }

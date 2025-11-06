@@ -15,6 +15,7 @@ cauldron_config = { path = "crates/cauldron_config" }
 cauldron_game_detection = { path = "crates/cauldron_game_detection" }
 cauldron_metadata = { path = "crates/cauldron_metadata" }
 libdecima_core = { path = "crates/libdecima_core" }
+libdecima_rtti = { path = "crates/libdecima_rtti" }
 
 anyhow = "1.0.100"
 bitflags = "2.9.4"

@@ -4,7 +4,6 @@ use cauldron::mem::offset::Offset;
 use cauldron::prelude::{CauldronModDependency, CauldronModInfo};
 use libdecima_core::types::core::exported_symbols::{ExportedSymbolKind, ExportedSymbols};
 use std::ffi::c_void;
-use std::time::Duration;
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case)]

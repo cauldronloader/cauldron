@@ -1,0 +1,14 @@
+[package]
+name = "libdecima_rtti"
+edition.workspace = true
+version.workspace = true
+authors.workspace = true
+description = "Tooling for working with Decima RTTI"
+documentation.workspace = true
+
+[dependencies]
+bitflags.workspace = true
+
+[features]
+default = []
+macros = []

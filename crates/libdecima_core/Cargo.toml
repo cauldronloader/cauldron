@@ -10,6 +10,7 @@ documentation.workspace = true
 [dependencies]
 bitflags.workspace = true
 cauldron.workspace = true
+libdecima_rtti.workspace = true
 windows = { workspace = true, features = ["Win32_System_Threading"] }
 
 [features]

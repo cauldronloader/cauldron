@@ -451,7 +451,15 @@ version = "0.1.0-alpha"
 dependencies = [
  "bitflags 2.9.4",
  "cauldron",
+ "libdecima_rtti",
  "windows",
+]
+
+[[package]]
+name = "libdecima_rtti"
+version = "0.1.0-alpha"
+dependencies = [
+ "bitflags 2.9.4",
 ]
 
 [[package]]

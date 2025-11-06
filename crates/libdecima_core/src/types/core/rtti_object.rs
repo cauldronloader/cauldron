@@ -1,12 +1,12 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use crate::types::core::rtti::RTTI;
+use libdecima_rtti::sys::DecimaRTTI;
 
 #[derive(Debug)]
 #[repr(C)]
 pub struct RTTIObject_VTable {
-    pub GetRTTI: *const extern "C" fn(this: *mut RTTIObject) -> *const RTTI,
+    pub GetRTTI: *const extern "C" fn(this: *mut RTTIObject) -> *const DecimaRTTI,
     pub Destructor: *mut extern "C" fn(this: *mut RTTIObject),
 }
 
@@ -17,7 +17,7 @@ pub struct RTTIObject {
 }
 
 impl RTTIObject {
-    pub fn GetRTTI(&mut self) -> &RTTI {
+    pub fn GetRTTI(&mut self) -> &DecimaRTTI {
         unsafe { &*(&*(&*self.__vftable).GetRTTI)(self as *mut Self) }
     }
 }
