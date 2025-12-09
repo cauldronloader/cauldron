@@ -9,7 +9,7 @@ documentation.workspace = true
 
 [dependencies]
 dotenvy = "0.15.7"
-keyvalues-serde = "0.2.2"
+keyvalues-serde = "0.2.3"
 serde = { workspace = true, features = ["derive"] }
 semver.workspace = true
 
