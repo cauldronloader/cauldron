@@ -4,7 +4,7 @@ use crate::types::p_core::hashmap::HashMap;
 use crate::{assert_size, gen_with_vtbl};
 use bitflags::bitflags;
 use cauldron::mem::offset::Offset;
-use libdecima_rtti::NamedRTTI;
+use libdecima_rtti::RTTIWithName;
 use libdecima_rtti::sys::DecimaRTTI;
 use std::ffi::{CStr, c_char, c_void};
 use std::fmt::{Display, Formatter};
@@ -101,7 +101,7 @@ impl ExportedSymbolToken {
         unsafe {
             if self.name.is_null() {
                 if !self.r#type.is_null() {
-                    Some((&*self.r#type).get_symbol_name())
+                    Some((&*self.r#type).symbol_name())
                 } else {
                     None
                 }

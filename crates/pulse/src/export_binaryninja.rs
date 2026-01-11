@@ -2,7 +2,7 @@ use libdecima_core::types::core::exported_symbols::{
     ExportedSymbolKind, ExportedSymbols, ExportedSymbolsGroup,
 };
 use libdecima_core::types::core::rtti::{
-    DecimaRTTI, DecimaRTTIContainerData, DecimaRTTIKind, NamedRTTI,
+    DecimaRTTI, DecimaRTTIContainerData, DecimaRTTIKind, RTTIWithName,
 };
 use std::collections::HashMap;
 use std::ffi::{CStr, c_void};
@@ -109,7 +109,7 @@ fn export_type(
     containers: &mut Vec<*const DecimaRTTIContainerData>,
 ) -> anyhow::Result<()> {
     let kind_str = bn_kind_name(&rtti.kind);
-    let type_str = rtti.get_symbol_name();
+    let type_str = rtti.symbol_name();
 
     writeln!(file, "# {type_str} ({kind_str})")?;
 

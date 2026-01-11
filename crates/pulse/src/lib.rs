@@ -1,13 +1,14 @@
 mod export_binaryninja;
 mod export_symbols;
 mod export_types;
-mod exported_type_defs;
+mod exported_types;
 
 use crate::export_binaryninja::export_binary_ninja;
 use crate::export_symbols::export_symbols;
 use crate::export_types::export_types;
 use cauldron::prelude::*;
 use libdecima_core::types::core::factory_manager::FactoryManager;
+use libdecima_core::types::core::rtti::{DecimaRTTIKind, RTTIWithName};
 
 #[unsafe(no_mangle)]
 #[allow(non_snake_case)]

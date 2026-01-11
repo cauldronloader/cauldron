@@ -1,5 +1,5 @@
-use crate::NamedRTTI;
 use crate::sys::*;
+use crate::{RTTIWithAliases, RTTIWithName, RTTIWithValues};
 use std::ffi::CStr;
 
 impl DecimaRTTI {
@@ -116,29 +116,29 @@ impl DecimaRTTI {
     }
 }
 
-impl NamedRTTI for DecimaRTTI {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithName for DecimaRTTI {
+    fn symbol_name(&self) -> String {
         match self.kind {
-            DecimaRTTIKind::Atom => self.as_atom_unchecked().get_symbol_name(),
-            DecimaRTTIKind::Pointer => self.as_pointer_unchecked().get_symbol_name(),
-            DecimaRTTIKind::Container => self.as_container_unchecked().get_symbol_name(),
-            DecimaRTTIKind::Enum => self.as_enum_unchecked().get_symbol_name(),
-            DecimaRTTIKind::Compound => self.as_compound_unchecked().get_symbol_name(),
-            DecimaRTTIKind::FlagsEnum => self.as_enum_unchecked().get_symbol_name(),
-            DecimaRTTIKind::Pod => self.as_pod_unchecked().get_symbol_name(),
-            DecimaRTTIKind::BitSetEnum => self.as_bitset_enum_unchecked().get_symbol_name(),
+            DecimaRTTIKind::Atom => self.as_atom_unchecked().symbol_name(),
+            DecimaRTTIKind::Pointer => self.as_pointer_unchecked().symbol_name(),
+            DecimaRTTIKind::Container => self.as_container_unchecked().symbol_name(),
+            DecimaRTTIKind::Enum => self.as_enum_unchecked().symbol_name(),
+            DecimaRTTIKind::Compound => self.as_compound_unchecked().symbol_name(),
+            DecimaRTTIKind::FlagsEnum => self.as_enum_unchecked().symbol_name(),
+            DecimaRTTIKind::Pod => self.as_pod_unchecked().symbol_name(),
+            DecimaRTTIKind::BitSetEnum => self.as_bitset_enum_unchecked().symbol_name(),
         }
     }
 }
 
-impl NamedRTTI for DecimaRTTIAtom {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithName for DecimaRTTIAtom {
+    fn symbol_name(&self) -> String {
         unsafe { CStr::from_ptr(self.type_name).to_str().unwrap().to_string() }
     }
 }
 
-impl NamedRTTI for DecimaRTTIPointer {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithName for DecimaRTTIPointer {
+    fn symbol_name(&self) -> String {
         let outer_name = {
             let c_str = unsafe { (&*self.pointer_type).type_name };
             if c_str.is_null() {
@@ -149,13 +149,19 @@ impl NamedRTTI for DecimaRTTIPointer {
         };
 
         format!("{outer_name}<{}>", unsafe {
-            (&*self.item_type).get_symbol_name()
+            (&*self.item_type).symbol_name()
         })
     }
 }
 
-impl NamedRTTI for DecimaRTTIContainer {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithName for DecimaRTTIPointerData {
+    fn symbol_name(&self) -> String {
+        unsafe { CStr::from_ptr(self.type_name).to_str().unwrap().to_string() }
+    }
+}
+
+impl RTTIWithName for DecimaRTTIContainer {
+    fn symbol_name(&self) -> String {
         let outer_name = {
             let c_str = unsafe { (&*self.container_type).type_name };
             if c_str.is_null() {
@@ -166,37 +172,165 @@ impl NamedRTTI for DecimaRTTIContainer {
         };
 
         format!("{outer_name}<{}>", unsafe {
-            (&*self.item_type).get_symbol_name()
+            (&*self.item_type).symbol_name()
         })
     }
 }
 
-impl NamedRTTI for DecimaRTTIEnum {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithName for DecimaRTTIContainerData {
+    fn symbol_name(&self) -> String {
         unsafe { CStr::from_ptr(self.type_name).to_str().unwrap().to_string() }
     }
 }
 
-impl NamedRTTI for DecimaRTTIEnumValue {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithName for DecimaRTTIEnum {
+    fn symbol_name(&self) -> String {
+        unsafe { CStr::from_ptr(self.type_name).to_str().unwrap().to_string() }
+    }
+}
+
+impl RTTIWithName for DecimaRTTIEnumValue {
+    fn symbol_name(&self) -> String {
         unsafe { CStr::from_ptr(self.name).to_str().unwrap().to_string() }
     }
 }
 
-impl NamedRTTI for DecimaRTTICompound {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithValues for DecimaRTTIEnum {
+    type Value = DecimaRTTIEnumValue;
+
+    fn values(&self) -> Vec<Self::Value> {
+        if self.values_length > 0 && !self.values.is_null() {
+            unsafe {
+                Vec::from_raw_parts(
+                    self.values as *mut DecimaRTTIEnumValue,
+                    self.values_length as usize,
+                    self.values_length as usize,
+                )
+            }
+        } else {
+            Vec::new()
+        }
+    }
+}
+
+impl RTTIWithAliases for DecimaRTTIEnumValue {
+    fn aliases(&self) -> Vec<String> {
+        fn maybe_alias(ptr: &*const c_char) -> Option<String> {
+            let ptr = *ptr;
+            if ptr.is_null() {
+                None
+            } else {
+                Some(unsafe { CStr::from_ptr(ptr).to_str().unwrap().to_string() })
+            }
+        }
+
+        self.aliases.iter().filter_map(maybe_alias).collect()
+    }
+}
+
+impl RTTIWithName for DecimaRTTICompound {
+    fn symbol_name(&self) -> String {
         unsafe { CStr::from_ptr(self.type_name).to_str().unwrap().to_string() }
     }
 }
 
-impl NamedRTTI for DecimaRTTIPod {
-    fn get_symbol_name(&self) -> String {
-        format!("DecimaRTTIPod({:0x})", self.size)
+impl DecimaRTTICompound {
+    pub fn bases(&self) -> Vec<DecimaRTTICompoundBase> {
+        if self.bases_length == 0 || self.bases.is_null() {
+            Vec::new()
+        } else {
+            unsafe {
+                std::slice::from_raw_parts(
+                    self.bases as *mut _,
+                    self.bases_length as usize,
+                ).to_vec()
+            }
+        }
+    }
+
+    pub fn attributes(&self) -> Vec<DecimaRTTICompoundAttribute> {
+        if self.attributes_length == 0 || self.attributes.is_null() {
+            Vec::new()
+        } else {
+            unsafe {
+                std::slice::from_raw_parts(
+                    self.attributes as *mut _,
+                    self.attributes_length as usize,
+                ).to_vec()
+            }
+        }
+    }
+
+    pub fn message_handlers(&self) -> Vec<DecimaRTTICompoundMessageHandler> {
+        if self.message_handlers_length == 0 || self.message_handlers.is_null() {
+            Vec::new()
+        } else {
+            unsafe {
+                std::slice::from_raw_parts(
+                    self.message_handlers as *mut _,
+                    self.message_handlers_length as usize,
+                ).to_vec()
+            }
+        }
+    }
+
+    pub fn message_order_entries(&self) -> Vec<DecimaRTTICompoundMessageOrderEntry> {
+        if self.message_order_entries_length == 0 || self.message_order_entries.is_null() {
+            Vec::new()
+        } else {
+            unsafe {
+                std::slice::from_raw_parts(
+                    self.message_order_entries as *mut _,
+                    self.message_order_entries_length as usize,
+                ).to_vec()
+            }
+        }
+    }
+
+    pub fn ordered_attributes(&self) -> Vec<DecimaRTTICompoundOrderedAttribute> {
+        if self.ordered_attributes_length == 0 || self.ordered_attributes.is_null() {
+            Vec::new()
+        } else {
+            unsafe {
+                std::slice::from_raw_parts(
+                    self.ordered_attributes as *mut _,
+                    self.ordered_attributes_length as usize,
+                ).to_vec()
+            }
+        }
     }
 }
 
-impl NamedRTTI for DecimaRTTIBitSetEnum {
-    fn get_symbol_name(&self) -> String {
+impl RTTIWithName for DecimaRTTICompoundAttribute {
+    fn symbol_name(&self) -> String {
+        unsafe {
+            CStr::from_ptr(self.attribute_name)
+                .to_str()
+                .unwrap()
+                .to_string()
+        }
+    }
+}
+
+impl RTTIWithName for DecimaRTTICompoundOrderedAttribute {
+    fn symbol_name(&self) -> String {
+        unsafe {
+            CStr::from_ptr(self.attribute_name)
+                .to_str()
+                .unwrap()
+                .to_string()
+        }
+    }
+}
+
+impl RTTIWithName for DecimaRTTIPod {
+    fn symbol_name(&self) -> String {
+        format!("DecimaRTTIPod({})", self.size)
+    }
+}
+
+impl RTTIWithName for DecimaRTTIBitSetEnum {
+    fn symbol_name(&self) -> String {
         unsafe { CStr::from_ptr(self.type_name).to_str().unwrap().to_string() }
     }
 }

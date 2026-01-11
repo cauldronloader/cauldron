@@ -12,12 +12,21 @@ pub mod string;
 pub mod sys;
 
 pub mod prelude {
-    pub use crate::NamedRTTI;
+    pub use crate::RTTIWithAliases;
+    pub use crate::RTTIWithName;
+    pub use crate::RTTIWithValues;
     pub use crate::string::*;
     pub use crate::sys::*;
 }
 
 // todo(py): replace with rust safe rtti impls
-pub trait NamedRTTI {
-    fn get_symbol_name(&self) -> String;
+pub trait RTTIWithAliases {
+    fn aliases(&self) -> Vec<String>;
+}
+pub trait RTTIWithName {
+    fn symbol_name(&self) -> String;
+}
+pub trait RTTIWithValues {
+    type Value;
+    fn values(&self) -> Vec<Self::Value>;
 }

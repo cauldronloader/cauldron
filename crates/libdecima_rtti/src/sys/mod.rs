@@ -26,7 +26,7 @@ bitflags::bitflags! {
 
 /// While Rust doesn't have a concept of type inheritance, C++ does and Decima is a C++ engine.
 /// This is used as a base for all other Decima RTTI type structs.
-/// In any Decima RTTI struct that "extends" this, it is accessible as the first field which is named `rtti_base`.
+/// In any Decima RTTI struct that "extend" this, it is accessible as the first field which is named `rtti_base`.
 #[repr(C, packed(1))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DecimaRTTI {
@@ -146,21 +146,21 @@ pub struct DecimaRTTIContainerData {
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct DecimaRTTIContainer {
-    pub rtti_base: DecimaRTTI,
-    pub has_pointers: bool,
-    pub item_type: *mut DecimaRTTI,
-    pub container_type: *mut DecimaRTTIContainerData,
-    pub type_name: *const c_char,
-}
-
-#[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DecimaRTTIPointer {
     pub rtti_base: DecimaRTTI,
     pub has_pointers: bool,
     pub item_type: *mut DecimaRTTI,
     pub pointer_type: *mut DecimaRTTIPointerData,
+    pub type_name: *const c_char,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct DecimaRTTIContainer {
+    pub rtti_base: DecimaRTTI,
+    pub has_pointers: bool,
+    pub item_type: *mut DecimaRTTI,
+    pub container_type: *mut DecimaRTTIContainerData,
     pub type_name: *const c_char,
 }
 
@@ -213,6 +213,10 @@ pub struct DecimaRTTICompoundAttribute {
     pub offset: u16,
     pub flags: DecimaRTTICompoundAttributeFlags,
     pub attribute_name: *const c_char,
+    pub func_get: extern "C" fn(*const c_void, *mut c_void),
+    pub func_set: extern "C" fn(*mut c_void, *const c_void),
+    pub range_min: *const c_char,
+    pub range_max: *const c_char,
 }
 
 #[repr(C)]
@@ -222,6 +226,10 @@ pub struct DecimaRTTICompoundOrderedAttribute {
     pub offset: u16,
     pub flags: DecimaRTTICompoundAttributeFlags,
     pub attribute_name: *const c_char,
+    pub func_get: extern "C" fn(*const c_void, *mut c_void),
+    pub func_set: extern "C" fn(*mut c_void, *const c_void),
+    pub range_min: *const c_char,
+    pub range_max: *const c_char,
 
     pub parent: *const DecimaRTTI,
     pub group: *const c_char,
@@ -259,8 +267,7 @@ pub struct DecimaRTTICompound {
 
     pub func_constructor:
         extern "C" fn(rtti: *const DecimaRTTI, object: *mut c_void) -> *mut c_void,
-    pub func_deconstructor:
-        extern "C" fn(rtti: *const DecimaRTTI, object: *mut c_void) -> *mut c_void,
+    pub func_destructor: extern "C" fn(rtti: *const DecimaRTTI, object: *mut c_void) -> *mut c_void,
     pub func_from_string: extern "C" fn(object: *mut c_void, &mut DString) -> bool,
     pub func_unk0: extern "C" fn(),
     pub func_to_string: extern "C" fn(object: *mut c_void, &mut DString) -> bool,
