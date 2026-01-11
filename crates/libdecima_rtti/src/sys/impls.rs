@@ -240,10 +240,8 @@ impl DecimaRTTICompound {
             Vec::new()
         } else {
             unsafe {
-                std::slice::from_raw_parts(
-                    self.bases as *mut _,
-                    self.bases_length as usize,
-                ).to_vec()
+                std::slice::from_raw_parts(self.bases as *mut _, self.bases_length as usize)
+                    .to_vec()
             }
         }
     }
@@ -256,7 +254,8 @@ impl DecimaRTTICompound {
                 std::slice::from_raw_parts(
                     self.attributes as *mut _,
                     self.attributes_length as usize,
-                ).to_vec()
+                )
+                .to_vec()
             }
         }
     }
@@ -269,7 +268,8 @@ impl DecimaRTTICompound {
                 std::slice::from_raw_parts(
                     self.message_handlers as *mut _,
                     self.message_handlers_length as usize,
-                ).to_vec()
+                )
+                .to_vec()
             }
         }
     }
@@ -282,7 +282,8 @@ impl DecimaRTTICompound {
                 std::slice::from_raw_parts(
                     self.message_order_entries as *mut _,
                     self.message_order_entries_length as usize,
-                ).to_vec()
+                )
+                .to_vec()
             }
         }
     }
@@ -295,7 +296,8 @@ impl DecimaRTTICompound {
                 std::slice::from_raw_parts(
                     self.ordered_attributes as *mut _,
                     self.ordered_attributes_length as usize,
-                ).to_vec()
+                )
+                .to_vec()
             }
         }
     }
