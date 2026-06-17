@@ -9,7 +9,7 @@ documentation.workspace = true
 [dependencies]
 log.workspace = true
 dotenvy = "0.15.7"
-clap = { version = "4.5.57", features = ["derive"] }
+clap = { version = "4.5.58", features = ["derive"] }
 env_logger = "0.11.8"
 open = "5.3.3"
 cauldron_game_detection.workspace = true
